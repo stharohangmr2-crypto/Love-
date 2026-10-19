@@ -75,6 +75,18 @@ select{width:100%;padding:11px;border-radius:12px;border:1px solid var(--bd);bac
 .crow{display:flex;gap:8px}
 .crow input{margin:0}
 .crow .btn{width:auto;margin:0;padding:0 18px}
+.rc{text-align:center;padding:2px 0 14px;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.rc .lb{font-size:13px;color:var(--mu)}
+button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var(--tx);font:800 44px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:10px;padding:4px 0 4px 10px}
+.rc .lb2{font-size:12.5px;color:var(--mu)}
+.pc{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.pc b{font-size:17px}
+.pc span{font-size:13px;color:var(--mu)}
+.pl .you{color:var(--mu);font-size:12px;margin-left:6px}
+.tip{margin:12px 0;padding:12px 14px;border:1px dashed var(--ch);border-radius:14px;text-align:center}
+.tip .tr{font-size:13px;color:var(--ch);font-weight:700}
+.tip .tw{font-size:32px;font-weight:800;margin:6px 0 2px;word-break:break-word}
+.tip small{display:block;font-size:12.5px;color:var(--mu);line-height:1.4;margin-top:4px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -110,6 +122,7 @@ select{width:100%;padding:11px;border-radius:12px;border:1px solid var(--bd);bac
     <div class="role" id="mname"></div>
     <p style="margin:6px 0 4px;font-size:18px" id="rule"></p>
     <p style="color:var(--mu);margin:0 0 12px">First to speak: <b id="first" style="color:var(--tx)"></b></p>
+    <div id="tip"></div>
     <div id="reveal" class="hide">
       <div class="role" id="rl"></div>
       <div class="word" id="impname" style="color:var(--ac2)"></div>
@@ -264,7 +277,8 @@ $("next").onclick=function(){
       var m=MODES.filter(function(o){return o.id===mode})[0];
       $("mname").textContent=m.n+" mode";$("rule").textContent=RULES[mode];$("show").textContent=mode==="age"?"Reveal age":"Reveal imposter";
       $("first").textContent=rnd(players);
-      $("reveal").classList.add("hide");$("show").classList.remove("hide");show("talk");
+      $("reveal").classList.add("hide");$("show").classList.remove("hide");
+      $("tip").innerHTML=rohanI>=0?tipHtml(imps.indexOf(rohanI)>=0,imps.length>0,pick,mode):"";show("talk");
     }else render();
   },350);
 };
@@ -288,6 +302,23 @@ var P={peer:null,conns:{},host:false,hostConn:null},ST=null,CACHE=null,CN=0;
 var O={uid:null,name:"",cin:"",code:null,room:null,view:"home",rooms:{},show:false,msg:"",ph:"",sig:"",nm:-1,lk:"",hb:0,busy:0};
 try{O.name=localStorage.getItem("imp_oname")||saved[0]||"";O.uid=sessionStorage.getItem("imp_uid")}catch(e){}
 if(!O.uid){O.uid="u"+Math.random().toString(36).slice(2,10);try{sessionStorage.setItem("imp_uid",O.uid)}catch(e){}}
+var CLUES={"Pizza":["Shared","Cheesy","Slice"],"Elephant":["Big","Trunk","Herd"],"Guitar":["Music","Strings","Chords"],"Hospital":["Busy","Nurses","Beds"],"Football":["Team","Goals","Pitch"],"Airplane":["Travel","Wings","Takeoff"],"Library":["Quiet","Shelves","Borrow"],"Ocean":["Wide","Waves","Tide"],"Birthday":["Yearly","Cake","Presents"],"Doctor":["Helpful","Checkup","Prescription"],"Volcano":["Hot","Eruption","Lava"],"Cinema":["Dark","Screen","Tickets"],"Bicycle":["Outdoors","Wheels","Handlebars"],"Snowman":["Winter","Cold","Scarf"],"Pirate":["Adventure","Ship","Parrot"],"Chess":["Thinking","Board","Checkmate"],"Coffee":["Warm","Caffeine","Mug"],"Rainbow":["Pretty","After rain","Seven colours"],"Astronaut":["Far","Space","Helmet"],"Castle":["Old","Towers","Knights"],"Ninja":["Quiet","Stealth","Throwing stars"],"Sushi":["Fresh","Raw fish","Chopsticks"],"Camera":["Memories","Click","Photos"],"Desert":["Dry","Sand","Camel"],"Robot":["Modern","Metal","Programmed"],"Dragon":["Mythical","Scales","Breathes fire"],"Lighthouse":["Tall","Beam","Ships"],"Piano":["Musical","Keys","Grand"],"Tiger":["Wild","Stripes","Jungle"],"Rocket":["Fast","Blast off","Countdown"],"Mountain":["High","Climb","Peak"],"Samurai":["Ancient","Sword","Japan"],"Fireworks":["Loud","Sparkle","Bang"],"School":["Learning","Teachers","Homework"],"Wedding":["Celebration","Vows","Bride"]};
+var PCL={"Tea|Coffee":"Warm drink","Cat|Dog":"Pet","Pizza|Burger":"Fast food","Beach|Pool":"Water","Guitar|Violin":"Strings","Train|Bus":"Commute","Moon|Sun":"Sky","Football|Rugby":"Team sport","Sushi|Noodles":"Asian food","Apple|Pear":"Fruit","Ninja|Samurai":"Japan","Lion|Tiger":"Big cat","Movie|Series":"Watching","Pen|Pencil":"Writing","Rain|Snow":"Weather","Castle|Palace":"Royal"};
+var QANS={};
+(function(){var a=[["Pasta","Olives"],["Japan","Antarctica"],["Flying","Mind reading"],["Panda","Snake"],["Brushing teeth","Scrolling"],["Chess","Monopoly"],["Inception","Cats"]];QUES.forEach(function(q,i){if(a[i]){QANS[q[0]]=a[i][0];QANS[q[1]]=a[i][1]}})})();
+function tipHtml(isImp,anyImp,pk,md){
+  if(!pk||md==="age")return"";
+  var role=isImp?"You’re the imposter":anyImp?"You’re crew":"You’re crew (nobody is the imposter)",best,alt="",avoid="",why;
+  if(md==="under"){best=PCL[pk.a+"|"+pk.b]||PCL[pk.b+"|"+pk.a]||"Something both words share";why="Fits both words, so it blends in either way."}
+  else if(md==="quest"){best=QANS[isImp?pk.b:pk.a]||"Depends";why="Matches your question. Keep it to 1 to 3 words."}
+  else{
+    var k=CLUES[pk.a]||[pk.h||"Familiar"];
+    if(isImp){best=k[1]||k[0];alt=k[1]?k[0]:"";why="Sounds like you know the word without giving much away."}
+    else{best=k[0];alt=k[1]||"";avoid=k[2]||"";why="Vague enough that the imposter can’t guess the word."}
+  }
+  return'<div class="tip"><div class="tr">Rohan hint · '+esc(role)+'</div><div class="tw">'+esc(best)+'</div><small>'+esc(why)+'</small>'+
+    (alt?'<small>Backup: <b>'+esc(alt)+'</b></small>':'')+(avoid?'<small>Too revealing, skip: '+esc(avoid)+'</small>':'')+'</div>';
+}
 function setAt(path,val){
   if(!path.length)return;
   var o=ST;
@@ -362,7 +393,10 @@ function vRoom(){
   var list=us.map(function(u){var p=r.players[u];return'<div class="pl'+(p.alive===false?' out':'')+'">'+esc(p.name)+(u===r.host?' 👑':'')+'</div>'}).join("");
   var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
   if(ph==="lobby"){
-    h+=list;
+    var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</div>'}).join("");
+    h='<div class="panel"><div class="rc"><div class="lb">Room code</div><button class="code" data-a="copy" data-v="'+esc(O.code)+'">'+esc(O.code)+'</button><div class="lb2">'+(O.cp?'Copied. Send it to your friends':'Tap the code to copy it')+'</div></div>'+
+      '<div class="pc"><b>'+nj+' of 6 players joined</b><span>'+(nj<3?'Need '+(3-nj)+' more to start':'Ready to start')+'</span></div>'+pls;
+    if(!isH)h+='<p class="sub" style="margin:10px 0 0">Mode: '+esc(modeName(r.mode))+'</p>';
     if(isH)h+='<label class="t" style="margin-top:12px">Game mode</label><select id="om">'+OM.map(function(m){return'<option value="'+m.id+'"'+(m.id===r.mode?' selected':'')+'>'+m.n+'</option>'}).join("")+'</select><button class="btn" data-a="start">Start game</button>';
     else h+='<p class="sub" style="margin:10px 0 0">Waiting for the host to start…</p>';
     return h+leave;
@@ -378,6 +412,7 @@ function vRoom(){
     if(O.show)h+='<div class="hint" style="text-align:center;font-size:12px;margin-top:6px">Tap the card to hide it</div>';
     if(rohan&&ph==="reveal")h+='<div class="cm"><button data-a="swap">'+(im.indexOf(O.uid)>=0?"Make me crew":"Make me imposter")+'</button></div>';
   }
+  if(rohan&&(ph==="chat"||ph==="vote"))h+=tipHtml(im.indexOf(O.uid)>=0,im.length>0,(r.secret||{}).pick,r.mode);
   if(ph==="reveal"){
     var rd=r.ready||{},n=al.filter(function(u){return rd[u]}).length;
     if(!rd[O.uid]&&!out)h+='<button class="btn" data-a="ready">I’m ready</button>';
@@ -510,6 +545,7 @@ function tally(r){
 }
 function act(a,v){
   if(a==="back"){leaveLocal();show("setup");return}
+  if(a==="copy"){try{navigator.clipboard.writeText(v)}catch(e){}O.cp=true;O.sig="";draw();setTimeout(function(){O.cp=false;draw()},1800);return}
   if(a==="home"){O.view="home";O.sig="";O.msg="";draw();return}
   if(typeof Peer==="undefined"&&a!=="list"){oshow("PeerJS didn’t load. Allow cdnjs or paste the PeerJS library into the file.");return}
   O.msg="";var r=O.room,me=r&&r.players&&r.players[O.uid];
