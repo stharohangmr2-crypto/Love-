@@ -144,6 +144,17 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 .nbody{border:1px dashed var(--ch);border-radius:14px;padding:2px 14px 10px;margin-top:8px}
 .nbody>.ks:first-child{border-top:0}
 .np.wide{width:100%;margin-top:4px}
+#dc{display:block;width:100%;aspect-ratio:1/1;border-radius:14px;border:1px solid var(--bd);background:#fff;touch-action:none;margin-top:10px}
+.dst{font-size:15px;font-weight:700}
+.dleg{display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--mu)}
+.dleg .lg{display:inline-flex;align-items:center;gap:5px}
+.dleg .lg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dleg .lg.now{color:var(--tx);font-weight:700}
+.drow{display:flex;gap:8px;margin-top:10px}
+.drow .btn{margin-top:0;flex:1;padding:12px}
+.drow .btn:disabled{opacity:.4}
+.dword{margin-top:10px;padding:10px 12px;border:1px dashed var(--ch);border-radius:12px;text-align:center;font-size:15px}
+.err.cerr{margin:0 0 8px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -192,10 +203,19 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
   </div>
 </section>
 <section id="online" class="hide">
+  <div id="ovDraw" class="panel hide" style="margin-bottom:12px">
+    <div class="dst" id="dstat"></div>
+    <div class="dleg" id="dleg"></div>
+    <canvas id="dc" width="800" height="800"></canvas>
+    <div class="dword hide" id="dword"></div>
+    <div class="drow hide" id="dctl"><button class="btn alt" id="dclr">Redo</button><button class="btn" id="dsub" disabled>Done</button></div>
+    <div class="drow"><button class="btn alt" id="dpk">Peek at my word</button></div>
+  </div>
   <div id="ovMain"></div>
   <div id="ovChat" class="panel hide" style="margin-top:12px">
     <div style="font-size:15px;font-weight:700;margin-bottom:10px">Discussion</div>
     <div id="msgs"></div>
+    <div class="err cerr" id="cerr"></div>
     <div class="crow"><input type="text" id="ci" maxlength="200" placeholder="Say something…"><button class="btn" id="cs">Send</button></div>
   </div>
 </section>
@@ -212,8 +232,12 @@ var MODES=[
 {id:"under",n:"Undercover",d:"Imposter gets a similar word and doesn’t know it"},
 {id:"quest",n:"Odd Question",d:"Imposter answers a different question"},
 {id:"chaos",n:"Chaos",d:"0, 1 or 2 imposters. Nobody knows"},
-{id:"age",n:"Guess the Age",d:"One player has a secret age. Everyone else asks questions to guess it"}];
-var RULES={classic:"Describe the word in one sentence each, then vote out the imposter.",blind:"Describe the word in one sentence each. The imposter is totally blind, so listen closely.",double:"Describe the word in one sentence each. Two of you are faking it.",under:"Describe your word in one sentence each. Someone has a different word and doesn’t know it.",quest:"Say your answer out loud, one by one. Someone answered a different question.",chaos:"Describe the word in one sentence each. There might be no imposter at all.",age:"Everyone knows who the age holder is. Ask them questions, then each player guesses their age."};
+{id:"age",n:"Guess the Age",d:"One player has a secret age. Everyone else asks questions to guess it"},
+{id:"draw",n:"Draw It",d:"Everyone adds strokes to a shared drawing. The imposter doesn’t know the word",o:1},
+{id:"emoji",n:"Emoji Only",d:"Describe the word with up to 3 emojis. The imposter only sees the category",o:1},
+{id:"last",n:"Last Letter",d:"Imposter knows only the first letter. One word each, and the imposter can guess",o:1}];
+var CATS={"Pizza":"Food","Elephant":"Animal","Guitar":"Instrument","Hospital":"Place","Football":"Sport","Airplane":"Transport","Library":"Place","Ocean":"Nature","Birthday":"Event","Doctor":"Job","Volcano":"Nature","Cinema":"Place","Bicycle":"Transport","Snowman":"Winter","Pirate":"Character","Chess":"Game","Coffee":"Drink","Rainbow":"Nature","Astronaut":"Job","Castle":"Place","Ninja":"Character","Sushi":"Food","Camera":"Object","Desert":"Nature","Robot":"Machine","Dragon":"Creature","Lighthouse":"Building","Piano":"Instrument","Tiger":"Animal","Rocket":"Transport","Mountain":"Nature","Samurai":"Character","Fireworks":"Event","School":"Place","Wedding":"Event"};
+var RULES={classic:"Describe the word in one sentence each, then vote out the imposter.",blind:"Describe the word in one sentence each. The imposter is totally blind, so listen closely.",double:"Describe the word in one sentence each. Two of you are faking it.",under:"Describe your word in one sentence each. Someone has a different word and doesn’t know it.",quest:"Say your answer out loud, one by one. Someone answered a different question.",chaos:"Describe the word in one sentence each. There might be no imposter at all.",age:"Everyone knows who the age holder is. Ask them questions, then each player guesses their age.",draw:"Take turns adding strokes to the shared drawing, then discuss and vote. Someone doesn’t know the word and is faking it.",emoji:"Chat with up to 3 emojis only. Someone only knows the category, so watch for vague ones.",last:"Say one word that goes with the secret word. The imposter only knows its first letter and gets one guess."};
 var rohanI=-1,N=4,mode="classic",players=[],imps=[],pick=null,idx=0,shown=false,ch={};
 var $=function(i){return document.getElementById(i)};
 var rnd=function(a){return a[Math.floor(Math.random()*a.length)]};
@@ -222,7 +246,7 @@ try{saved=JSON.parse(localStorage.getItem("imp_names")||"[]")}catch(e){}
 
 function buildModes(){
   var m=$("modes");m.innerHTML="";
-  MODES.forEach(function(o){var b=document.createElement("button");
+  MODES.filter(function(o){return !o.o}).forEach(function(o){var b=document.createElement("button");
     b.innerHTML="<b>"+o.n+"</b><span>"+o.d+"</span>";if(o.id===mode)b.className="on";
     b.onclick=function(){mode=o.id;buildModes()};m.appendChild(b)});
 }
@@ -281,6 +305,9 @@ function card(i){
   }else{
     c.role="You are the imposter";c.big=r?pick.a:"???";
     if(mode==="double")c.sub="Your partner: "+imps.filter(function(x){return x!==i}).map(function(x){return players[x]}).join(", ");
+    else if(mode==="draw")c.sub="You don’t know the word. Fake it from what’s drawn.";
+    else if(mode==="emoji")c.sub="Category: "+(pick.c||"Thing");
+    else if(mode==="last"){c.big=r?pick.a:pick.a.charAt(0).toUpperCase();c.sub="The word starts with this letter"}
     else if(mode!=="blind"||r)c.sub="Hint: "+pick.h;
     else c.sub="No hint. Good luck!";
     if(r&&mode==="double")c.sub+="\nHint: "+pick.h;
@@ -366,12 +393,17 @@ var PCL={"Tea|Coffee":"Warm drink","Cat|Dog":"Pet","Pizza|Burger":"Fast food","B
 var QANS={};
 (function(){var a=[["Pasta","Olives"],["Japan","Antarctica"],["Flying","Mind reading"],["Panda","Snake"],["Brushing teeth","Scrolling"],["Chess","Monopoly"],["Inception","Cats"]];QUES.forEach(function(q,i){if(a[i]){QANS[q[0]]=a[i][0];QANS[q[1]]=a[i][1]}})})();
 function tipData(isImp,anyImp,pk,md){
-  if(!pk||md==="age")return null;
+  if(!pk||md==="age"||md==="draw")return null;
   var role=isImp?"You’re the imposter":anyImp?"You’re crew":"You’re crew (nobody is the imposter)",best,alt="",avoid="",why;
-  if(md==="under"){best=PCL[pk.a+"|"+pk.b]||PCL[pk.b+"|"+pk.a]||"Something both words share";why="Fits both words, so it blends in either way."}
+  if(md==="emoji"){
+    if(isImp){best=CATEM[pk.c]||"❓";alt="🤔";why="You only know the category, so stay vague."}
+    else{best=EMO[pk.a]||"🙂";alt=CATEM[pk.c]||"";why="Up to 3 emojis. The backup is vaguer if the first is too obvious."}
+  }
+  else if(md==="under"){best=PCL[pk.a+"|"+pk.b]||PCL[pk.b+"|"+pk.a]||"Something both words share";why="Fits both words, so it blends in either way."}
   else if(md==="quest"){best=QANS[isImp?pk.b:pk.a]||"Depends";why="Matches your question. Keep it to 1 to 3 words."}
   else{
     var k=CLUES[pk.a]||[pk.h||"Familiar"];
+    if(md==="last"){k=k.filter(function(x){return !/\s/.test(x)});if(!k.length)k=["Familiar"]}
     if(isImp){best=k[1]||k[0];alt=k[1]?k[0]:"";why="Sounds like you know the word without giving much away."}
     else{best=k[0];alt=k[1]||"";avoid=k[2]||"";why="Vague enough that the imposter can’t guess the word."}
   }
@@ -392,7 +424,7 @@ function notesBody(c){
   var chip=function(w){return'<button data-a="say" data-v="'+esc(w)+'">'+esc(w)+'</button>'};
   if(d&&ph!=="reveal"){
     h+='<div class="ks"><div class="kl">Hint · '+esc(d.role)+'</div><div style="font-size:28px;font-weight:800;text-align:center;margin:4px 0;word-break:break-word">'+esc(d.best)+'</div><div class="kn" style="text-align:center">'+esc(d.why)+(d.alt?' Backup: '+esc(d.alt)+'.':'')+(d.avoid?' Skip: '+esc(d.avoid)+'.':'')+'</div>';
-    if(can)h+='<div class="chips">'+[d.best,d.alt].filter(Boolean).map(chip).join("")+'</div><div class="kl" style="margin-top:12px">Natural lines</div><div class="chips" style="justify-content:flex-start;margin-top:0">'+(isI?LINES.imp:LINES.crew).map(chip).join("")+'</div><div class="kn">Taps send after a random 1 to 3 second delay.</div>';
+    if(can)h+='<div class="chips">'+[d.best,d.alt].filter(Boolean).map(chip).join("")+'</div>'+(ONL[r.mode]?'':'<div class="kl" style="margin-top:12px">Natural lines</div><div class="chips" style="justify-content:flex-start;margin-top:0">'+(isI?LINES.imp:LINES.crew).map(chip).join("")+'</div>')+'<div class="kn">Taps send after a random 1 to 3 second delay.</div>';
     h+='</div>';
   }
   h+='<div class="ks"><div class="kl">Who is who</div>'+us.map(function(u){var p=r.players[u],x=im.indexOf(u)>=0;return'<div class="kr"><span'+(p.alive===false?' class="dim"':'')+'>'+esc(p.name)+(p.alive===false?' · out':'')+'</span><em class="bd '+(x?'bi':'bc')+'">'+(x?'imposter':'crew')+'</em></div>'}).join("")+'<div class="kn">'+esc(info(r))+'</div></div>';
@@ -456,6 +488,25 @@ function rq(m,p,b){
 }
 var get=function(p){return rq("GET",p)},put=function(p,b){return rq("PUT",p,b)},patch=function(p,b){return rq("PATCH",p,b)},del=function(p){return rq("DELETE",p)},push=function(p,b){return rq("POST",p,b)};
 var OM=MODES.filter(function(m){return m.id!=="age"});
+var ONL={draw:1,emoji:1,last:1},LAPS=2;
+var modeDesc=function(id){var m=MODES.filter(function(o){return o.id===id})[0];return m?m.d:""};
+var EMO={"Pizza":"🍕🧀","Elephant":"🐘🌍","Guitar":"🎸🎶","Hospital":"🏥🚑","Football":"⚽🏟️","Airplane":"✈️☁️","Library":"📚🤫","Ocean":"🌊🧂","Birthday":"🎂🕯️🎉","Doctor":"🩺👨‍⚕️","Volcano":"🌋🔥","Cinema":"🎬🍿","Bicycle":"🚲🦵","Snowman":"⛄🥕","Pirate":"🏴‍☠️💰","Chess":"♟️👑","Coffee":"☕🌅","Rainbow":"🌈☔","Astronaut":"🧑‍🚀🌌","Castle":"🏰🐊","Ninja":"🥷🌑","Sushi":"🍣🍚","Camera":"📷🔍","Desert":"🏜️🌵","Robot":"🤖⚙️","Dragon":"🐉🔥","Lighthouse":"💡🌊🚢","Piano":"🎹🎼","Tiger":"🐯🌴","Rocket":"🚀🔥","Mountain":"⛰️❄️","Samurai":"⚔️🏯","Fireworks":"🎆🌃","School":"🏫🔔","Wedding":"💍👰"};
+var CATEM={"Food":"🍽️","Animal":"🐾","Instrument":"🎵","Place":"📍","Sport":"🏅","Transport":"🚦","Nature":"🌿","Event":"🎉","Job":"💼","Winter":"❄️","Character":"🎭","Game":"🎲","Drink":"🥤","Object":"📦","Machine":"⚙️","Creature":"✨","Building":"🏢"};
+var PAL=["#e5484d","#3e63dd","#30a46c","#f5a524","#8e4ec6","#12a594"];
+var EPR=null;try{EPR=new RegExp("\\p{Extended_Pictographic}|\\p{Regional_Indicator}","u")}catch(e){}
+function isEmo(s){return !/[A-Za-z0-9#*]/.test(s)&&(EPR?EPR.test(s):/[^\u0000-\u2000]/.test(s))}
+function chatCheck(t,md){
+  t=String(t).trim();if(!t)return{e:""};
+  if(md==="last"){if(/\s/.test(t))return{e:"One word only"};return{t:t.slice(0,20)}}
+  if(md==="emoji"){
+    var raw=t.replace(/\s+/g,""),segs;
+    try{segs=Array.from(new Intl.Segmenter(undefined,{granularity:"grapheme"}).segment(raw),function(s){return s.segment})}catch(e){segs=Array.from(raw).filter(function(c){return c!=="\u200d"&&c!=="\ufe0f"})}
+    if(!segs.length||segs.length>3||!segs.every(isEmo))return{e:"Emojis only, up to 3"};
+    return{t:segs.join("")};
+  }
+  return{t:t.slice(0,200)};
+}
+function curDrawer(r){var d=r.dr||{},o=d.o||[],n=Object.keys(d.strokes||{}).length;return(!o.length||n>=o.length*LAPS)?null:o[n%o.length]}
 var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
 var modeName=function(id){var m=MODES.filter(function(o){return o.id===id})[0];return m?m.n:id};
 var rp=function(){return"rooms/"+O.code};
@@ -511,13 +562,13 @@ function vRoom(){
     var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</span></div>'}).join("");
     h='<div class="panel"><div class="rc"><div class="lb">Room code</div><button class="code" data-a="copy" data-v="'+esc(O.code)+'">'+esc(O.code)+'</button><div class="lb2">'+(O.cp?'Copied. Send it to your friends':'Tap the code to copy it')+'</div></div>'+
       '<div class="pc"><b>'+nj+' of 6 players joined</b><span>'+(nj<3?'Need '+(3-nj)+' more to start':'Ready to start')+'</span></div>'+pls;
-    if(!isH)h+='<p class="sub" style="margin:10px 0 0">Mode: '+esc(modeName(r.mode))+'</p>';
-    if(isH)h+='<label class="t" style="margin-top:12px">Game mode</label><select id="om">'+OM.map(function(m){return'<option value="'+m.id+'"'+(m.id===r.mode?' selected':'')+'>'+m.n+'</option>'}).join("")+'</select><button class="btn" data-a="start">Start game</button>';
+    if(!isH)h+='<p class="sub" style="margin:10px 0 0">Mode: '+esc(modeName(r.mode))+'<br><span style="font-size:13px">'+esc(modeDesc(r.mode))+'</span></p>';
+    if(isH)h+='<label class="t" style="margin-top:12px">Game mode</label><select id="om">'+OM.map(function(m){return'<option value="'+m.id+'"'+(m.id===r.mode?' selected':'')+'>'+m.n+'</option>'}).join("")+'</select><p class="sub" style="margin:8px 0 0;font-size:13px">'+esc(modeDesc(r.mode))+'</p><button class="btn" data-a="start">Start game</button>';
     else h+='<p class="sub" style="margin:10px 0 0">Waiting for the host to start…</p>';
     return h+leave;
   }
   if(ph==="over"){
-    var wn=r.winner==="crew"?["crew","Crew wins","The imposter was found."]:r.winner==="imps"?["imp","Imposter wins","Only 2 players remain."]:["none","No imposter this time","Nobody was faking it."];
+    var wn=r.winner==="crew"?["crew","Crew wins",r.why==="wrong"?"The imposter guessed the wrong word.":"The imposter was found."]:r.winner==="imps"?["imp","Imposter wins",r.why==="guess"?"The imposter guessed the word.":"Only 2 players remain."]:["none","No imposter this time","Nobody was faking it."];
     h+='<div class="win '+wn[0]+'"><h2>'+wn[1]+'</h2><p>'+wn[2]+'</p></div>'+resBlock(r)+rolesBlock(r,us);
     if(isH)h+='<button class="btn" data-a="again">Play again</button>';
     return h+leave;
@@ -526,6 +577,14 @@ function vRoom(){
   else{
     h+=O.show?cardHtml(ocard(r,us)):'<div class="oc" data-a="peek"><div class="word sm">Tap to see your card</div><div class="hint">Make sure nobody is looking</div></div>';
     if(O.show)h+='<div class="hint" style="text-align:center;font-size:12px;margin-top:6px">Tap the card to hide it</div>';
+  }
+  if(ONL[r.mode])h+='<p class="sub" style="margin:10px 0 0;font-size:13px">'+esc(RULES[r.mode])+'</p>';
+  if(r.mode==="last"&&!out&&(ph==="chat"||ph==="vote")&&im.indexOf(O.uid)>=0&&!(r.guessed||{})[O.uid])
+    h+='<div class="ks" style="margin-top:10px"><div class="kl">Think you know the word? One guess. If you’re wrong, you’re out.</div><div class="crow"><input type="text" id="gw" maxlength="20" placeholder="Your guess" value="'+esc(O.gw||"")+'"><button class="btn" data-a="guess">Guess</button></div></div>';
+  if(ph==="draw"){
+    var cu=curDrawer(r);
+    h+='<div style="margin-top:10px">'+us.map(function(u){var p=r.players[u];return'<div class="pl">'+av(p.name)+'<span>'+esc(p.name)+(u===cu?' ✏️ drawing now':'')+'</span></div>'}).join("")+'</div>';
+    h+=isH?'<button class="btn alt" data-a="skip">Skip current turn</button><button class="btn" data-a="enddraw">Finish drawing</button>':'<p class="sub" style="margin:10px 0 0">The discussion starts when everyone has drawn.</p>';
   }
   if(ph==="reveal"){
     var rd=r.ready||{},n=al.filter(function(u){return rd[u]}).length;
@@ -542,16 +601,17 @@ function vRoom(){
     h+='<p class="sub" style="margin:10px 0 0">'+c+'/'+al.length+' voted</p>';
     if(isH)h+='<button class="btn" data-a="count">Count votes</button>';
   }
-  if(rohan&&(ph==="reveal"||ph==="chat"||ph==="vote"))h+=notes({r:r,us:us,al:al,im:im,ph:ph,out:out});
+  if(rohan&&(ph==="reveal"||ph==="draw"||ph==="chat"||ph==="vote"))h+=notes({r:r,us:us,al:al,im:im,ph:ph,out:out});
   return h+leave;
 }
 function draw(){
-  var n=$("on"),c=$("oc");if(n)O.name=n.value;if(c)O.cin=c.value;
+  var n=$("on"),c=$("oc"),g=$("gw");if(n)O.name=n.value;if(c)O.cin=c.value;if(g)O.gw=g.value;
   var h=O.view==="home"?vHome():O.view==="list"?vList():vRoom();
   $("ovMain").innerHTML=(O.msg?'<div class="err" style="margin:0 0 10px">'+esc(O.msg)+'</div>':"")+h;
   var r=O.room,me=r&&r.players&&r.players[O.uid];
   $("ovChat").classList.toggle("hide",!(O.view==="room"&&r&&["chat","vote","over"].indexOf(r.phase)>=0));
-  $("ci").placeholder=me&&me.alive===false?"Spectators can’t chat":"Say something…";
+  $("ci").placeholder=me&&me.alive===false?"Spectators can’t chat":r&&r.mode==="emoji"?"Up to 3 emojis":r&&r.mode==="last"?"One word":"Say something…";
+  updDraw();
 }
 function showChat(c){
   var k=Object.keys(c).sort(),last=k[k.length-1]||"";
@@ -680,7 +740,17 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     leaveLocal();draw();return;
   }
   if(a==="peek"){if(me.alive===false)return;if(!O.show){O.show=true;put(rp()+"/seen/"+O.uid,true).catch(function(){})}else O.show=false;draw();return}
-  if(a==="say"){if(me.alive!==false){var tx=String(v).slice(0,200),nm2=O.name,u2=O.uid,cd=O.code;setTimeout(function(){if(O.code===cd)wr(push("rooms/"+cd+"/chat",{u:u2,n:nm2,t:tx}))},900+Math.random()*1900)}return}
+  if(a==="guess"){
+    var imx=(r.secret||{}).imps||[],gi=$("gw"),gs=((gi&&gi.value)||"").toLowerCase().replace(/[^a-z]/g,""),pa=String(((r.secret||{}).pick||{}).a||"").toLowerCase().replace(/[^a-z]/g,"");
+    if(!gs||r.mode!=="last"||imx.indexOf(O.uid)<0||(r.guessed||{})[O.uid]||me.alive===false||(r.phase!=="chat"&&r.phase!=="vote"))return;
+    O.gw="";
+    var gu={phase:"over",votes:null};gu["guessed/"+O.uid]=true;
+    if(gs===pa){gu.winner="imps";gu.why="guess"}
+    else{gu["players/"+O.uid+"/alive"]=false;gu.winner="crew";gu.why="wrong";gu.result={name:O.name,was:true}}
+    upd(gu);
+    return;
+  }
+  if(a==="say"){if(me.alive!==false){var ck=chatCheck(v,r.mode);if(!ck.t)return;var tx=ck.t,nm2=O.name,u2=O.uid,cd=O.code;setTimeout(function(){if(O.code===cd)wr(push("rooms/"+cd+"/chat",{u:u2,n:nm2,t:tx}))},900+Math.random()*1900)}return}
   if(a==="revive"){wr(put(rp()+"/players/"+O.uid+"/alive",true));return}
   if(a==="ready"){wr(put(rp()+"/ready/"+O.uid,true));return}
   if(a==="vote"){wr(put(rp()+"/votes/"+O.uid,v));return}
@@ -692,6 +762,8 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     return;
   }
   if(!host)return;
+  if(a==="skip"){if(r.phase==="draw")commitStroke(r,[]);return}
+  if(a==="enddraw"){upd({phase:"chat"});return}
   if(a==="start"){
     var us=order(r),n=us.length,m=r.mode;
     if(n<3){oshow("Need at least 3 players");return}
@@ -699,15 +771,19 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     var k=m==="double"?2:m==="chaos"?rnd([0,1,1,2]):1,sh=us.slice().sort(function(){return Math.random()-.5}),pk;
     if(m==="under"){var p=rnd(PAIRS);if(Math.random()<.5)p=[p[1],p[0]];pk={a:p[0],b:p[1]}}
     else if(m==="quest"){var q=rnd(QUES);pk={a:q[0],b:q[1]}}
-    else{var w=rnd(WORDS);pk={a:w[0],h:w[1]}}
+    else{var w=rnd(WORDS);pk={a:w[0],h:w[1],c:CATS[w[0]]||"Thing"}}
     var sc={pick:pk};if(k)sc.imps=sh.slice(0,k);
-    upd({phase:"reveal",secret:sc,seen:null,ready:null,votes:null,chat:null,round:1,result:null,winner:null});return;
+    upd({phase:"reveal",secret:sc,seen:null,ready:null,votes:null,chat:null,round:1,result:null,winner:null,why:null,guessed:null,dr:null});return;
   }
-  if(a==="begin"){upd({phase:"chat"});return}
+  if(a==="begin"){
+    if(r.mode==="draw")upd({phase:"draw",dr:{o:order(r).sort(function(){return Math.random()-.5})}});
+    else upd({phase:"chat"});
+    return;
+  }
   if(a==="tovote"){upd({phase:"vote",votes:null});return}
   if(a==="count"){tally(r);return}
   if(a==="again"){
-    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null};
+    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null,why:null,guessed:null,dr:null};
     order(r).forEach(function(u){u2["players/"+u+"/alive"]=true});upd(u2);
   }
 }
@@ -721,8 +797,74 @@ $("ovMain").onchange=function(e){
 function send(){
   var t=$("ci").value.trim(),r=O.room,me=r&&r.players&&r.players[O.uid];
   if(!t||!me||me.alive===false)return;
-  $("ci").value="";wr(push(rp()+"/chat",{u:O.uid,n:O.name,t:t.slice(0,200)}));
+  var ck=chatCheck(t,r.mode);
+  if(!ck.t){$("cerr").textContent=ck.e;return}
+  $("cerr").textContent="";
+  $("ci").value="";wr(push(rp()+"/chat",{u:O.uid,n:O.name,t:ck.t}));
 }
+
+/* ===== DRAW IT: shared canvas. It lives outside #ovMain so re-renders never wipe a stroke in progress ===== */
+var D={pend:null,dr:false,sent:-1,pt:0};
+function colorOf(r,u){var i=order(r).indexOf(u);return PAL[(i<0?0:i)%PAL.length]}
+function canDraw(){var r=O.room;return !!(r&&r.mode==="draw"&&r.phase==="draw"&&curDrawer(r)===O.uid)}
+function strokeLine(x,p,W,col){
+  var k=W/1000;x.strokeStyle=col;x.fillStyle=col;x.beginPath();
+  if(p.length<4){x.arc(p[0]*k,p[1]*k,x.lineWidth/2,0,6.2832);x.fill();return}
+  x.moveTo(p[0]*k,p[1]*k);for(var i=2;i<p.length;i+=2)x.lineTo(p[i]*k,p[i+1]*k);x.stroke();
+}
+function paintAll(){
+  var cv=$("dc"),x=cv.getContext("2d"),W=cv.width,r=O.room;
+  x.fillStyle="#fff";x.fillRect(0,0,W,W);x.lineCap="round";x.lineJoin="round";x.lineWidth=W*.009;
+  if(!r)return;
+  var st=(r.dr&&r.dr.strokes)||{};
+  Object.keys(st).sort().forEach(function(k){var s=st[k];if(s&&s.p&&s.p.length)strokeLine(x,s.p,W,colorOf(r,s.u))});
+  if(D.pend&&D.pend.length&&canDraw())strokeLine(x,D.pend,W,colorOf(r,O.uid));
+}
+function strokeCount(r){return r&&r.dr?Object.keys(r.dr.strokes||{}).length:0}
+function updBtns(){$("dsub").disabled=!(D.pend&&D.pend.length>=2&&D.sent!==strokeCount(O.room));$("dclr").disabled=!D.pend}
+function updDraw(){
+  var r=O.room,box=$("ovDraw"),me=r&&r.players&&r.players[O.uid];
+  var on=!!(O.view==="room"&&r&&me&&r.mode==="draw"&&["draw","chat","vote","over"].indexOf(r.phase)>=0);
+  box.classList.toggle("hide",!on);
+  if(!on){D.pend=null;return}
+  var o=(r.dr||{}).o||[],n=strokeCount(r),tot=o.length*LAPS,cu=curDrawer(r),mine=canDraw()&&me.alive!==false;
+  if(D.sent>=0&&n!==D.sent)D.sent=-1;
+  if(!mine)D.pend=null;
+  var nm=function(u){return r.players[u]?r.players[u].name:"?"};
+  $("dstat").textContent=r.phase==="draw"?(mine?"Your turn: draw one stroke ("+(n+1)+"/"+tot+")":(cu?nm(cu)+" is drawing ("+(n+1)+"/"+tot+")":"Drawing finished")):"The final drawing";
+  $("dleg").innerHTML=order(r).map(function(u){return'<span class="lg'+(r.phase==="draw"&&u===cu?' now':'')+'"><i style="background:'+colorOf(r,u)+'"></i>'+esc(nm(u))+'</span>'}).join("");
+  $("dctl").classList.toggle("hide",!mine);
+  $("dpk").classList.toggle("hide",me.alive===false);
+  paintAll();updBtns();
+}
+function commitStroke(r,p){
+  var d=r.dr||{},o=d.o||[],n=strokeCount(r),tot=o.length*LAPS;
+  if(!o.length||n>=tot)return;
+  var pr=push(rp()+"/dr/strokes",{u:o[n%o.length],p:p});
+  if(n+1>=tot)pr=pr.then(function(){return patch(rp(),{phase:"chat"})});
+  pr.catch(function(){D.sent=-1});
+  wr(pr);
+}
+(function(){
+  var cv=$("dc");
+  function pt(e){var b=cv.getBoundingClientRect();return[Math.max(0,Math.min(1000,Math.round((e.clientX-b.left)/b.width*1000))),Math.max(0,Math.min(1000,Math.round((e.clientY-b.top)/b.height*1000)))]}
+  cv.addEventListener("pointerdown",function(e){if(!canDraw())return;e.preventDefault();D.dr=true;try{cv.setPointerCapture(e.pointerId)}catch(z){}D.pend=pt(e);paintAll();updBtns()});
+  cv.addEventListener("pointermove",function(e){if(!D.dr||!D.pend)return;var p=pt(e),n=D.pend.length;if(n<600&&Math.abs(p[0]-D.pend[n-2])+Math.abs(p[1]-D.pend[n-1])>4){D.pend.push(p[0],p[1]);paintAll()}});
+  ["pointerup","pointercancel"].forEach(function(n){cv.addEventListener(n,function(){D.dr=false;updBtns()})});
+  $("dclr").onclick=function(){D.pend=null;paintAll();updBtns()};
+  $("dsub").onclick=function(){
+    var r=O.room;if(!r||!canDraw()||!D.pend||D.pend.length<2)return;
+    var n=strokeCount(r);if(D.sent===n)return;
+    D.sent=n;commitStroke(r,D.pend.slice());updBtns();
+  };
+  $("dpk").onclick=function(){
+    var r=O.room;if(!r)return;
+    var c=ocard(r,order(r)),w=$("dword");
+    w.textContent=c.role+": "+c.big+(c.imp&&c.sub?" · "+c.sub:"");w.classList.remove("hide");
+    put(rp()+"/seen/"+O.uid,true).catch(function(){});
+    clearTimeout(D.pt);D.pt=setTimeout(function(){w.classList.add("hide")},4000);
+  };
+})();
 $("cs").onclick=send;
 $("ci").onkeydown=function(e){if(e.key==="Enter")send()};
 $("goOnline").onclick=function(){O.view="home";O.sig="";show("online");draw()};
