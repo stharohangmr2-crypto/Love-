@@ -87,6 +87,56 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 .tip .tr{font-size:13px;color:var(--ch);font-weight:700}
 .tip .tw{font-size:32px;font-weight:800;margin:6px 0 2px;word-break:break-word}
 .tip small{display:block;font-size:12.5px;color:var(--mu);line-height:1.4;margin-top:4px}
+
+:root{--ok:#2fbf8a}
+.rh{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rh span{font-size:12.5px;padding:3px 10px;border-radius:99px;border:1px solid var(--bd);color:var(--mu)}
+.rh span:first-child{color:var(--tx);font-weight:700;letter-spacing:1.5px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.pl{display:flex;align-items:center;gap:10px;padding:7px 0}
+.av{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+.win{border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid var(--bd);background:var(--bg)}
+.win.crew{border-color:var(--ok);background:rgba(47,191,138,.12)}
+.win.imp{border-color:var(--ac2);background:rgba(255,74,110,.12)}
+.win h2{margin:0;font-size:26px;letter-spacing:-.4px}
+.win p{margin:4px 0 0;color:var(--mu);font-size:14px}
+.lv{font-size:13px;color:var(--mu);margin:0 0 6px}
+.pr{display:flex;align-items:center;gap:10px;padding:9px 12px;margin-top:6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg)}
+.pr.i{border-color:var(--ac2)}
+.pr .nm{flex:1;font-size:16px}
+.pr .nm small{display:block;font-size:12px;color:var(--mu)}
+.bd{font-style:normal;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.bi{color:var(--ac2);border:1px solid var(--ac2)}
+.bc{color:var(--mu);border:1px solid var(--bd)}
+.wd{margin-top:12px;text-align:center;padding:14px;border-radius:14px;background:var(--bg);border:1px solid var(--bd)}
+.wd span{display:block;font-size:12.5px;color:var(--mu)}
+.wd b{display:block;font-size:30px;letter-spacing:-.5px;margin-top:2px}
+.wd b.s{font-size:18px;letter-spacing:0;margin-top:6px}
+#msgs{display:flex;flex-direction:column;gap:7px;max-height:300px}
+.b{display:flex;gap:8px;align-items:flex-end;max-width:86%}
+.b.me{align-self:flex-end}
+.bt{background:var(--bg);border:1px solid var(--bd);border-radius:14px 14px 14px 4px;padding:7px 11px;font-size:14.5px;word-break:break-word}
+.bt i{display:block;font-style:normal;font-size:11px;color:var(--mu);margin-bottom:1px}
+.b.me .bt{background:var(--ac);border-color:var(--ac);color:#fff;border-radius:14px 14px 4px 14px}
+.kit{margin-top:12px;border:1px dashed var(--ch);border-radius:14px;padding:0 14px 8px}
+.kh{display:flex;justify-content:space-between;width:100%;background:none;border:0;color:var(--ch);font:inherit;font-size:14px;padding:11px 0}
+.ks{border-top:1px solid var(--bd);padding:10px 0 4px}
+.kl{font-size:12px;color:var(--mu);margin-bottom:4px}
+.kr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0;font-size:14px}
+.kr small{color:var(--mu);font-size:12px}
+.kn{font-size:12.5px;color:var(--mu);margin-top:4px}
+.kb{padding:7px 14px;border-radius:10px;border:0;background:var(--ch);color:#14121b;font-weight:700;font-size:13px}
+.kb.wide{width:100%;padding:11px;font-size:14px}
+.dim{opacity:.5}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.chips button{padding:7px 14px;border-radius:99px;border:1px solid var(--ch);background:transparent;color:var(--ch);font-size:14px}
+.kit select{margin-top:4px}
+.nt{margin-top:12px}
+.nh{display:flex;gap:8px}
+.nb,.np{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:10px;padding:8px 12px;font:inherit;font-size:12.5px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.nb{flex:1;text-align:left}
+.nbody{border:1px dashed var(--ch);border-radius:14px;padding:2px 14px 10px;margin-top:8px}
+.nbody>.ks:first-child{border-top:0}
+.np.wide{width:100%;margin-top:4px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -135,7 +185,7 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 <section id="online" class="hide">
   <div id="ovMain"></div>
   <div id="ovChat" class="panel hide" style="margin-top:12px">
-    <div class="role">Discussion</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:10px">Discussion</div>
     <div id="msgs"></div>
     <div class="crow"><input type="text" id="ci" maxlength="200" placeholder="Say something…"><button class="btn" id="cs">Send</button></div>
   </div>
@@ -306,8 +356,8 @@ var CLUES={"Pizza":["Shared","Cheesy","Slice"],"Elephant":["Big","Trunk","Herd"]
 var PCL={"Tea|Coffee":"Warm drink","Cat|Dog":"Pet","Pizza|Burger":"Fast food","Beach|Pool":"Water","Guitar|Violin":"Strings","Train|Bus":"Commute","Moon|Sun":"Sky","Football|Rugby":"Team sport","Sushi|Noodles":"Asian food","Apple|Pear":"Fruit","Ninja|Samurai":"Japan","Lion|Tiger":"Big cat","Movie|Series":"Watching","Pen|Pencil":"Writing","Rain|Snow":"Weather","Castle|Palace":"Royal"};
 var QANS={};
 (function(){var a=[["Pasta","Olives"],["Japan","Antarctica"],["Flying","Mind reading"],["Panda","Snake"],["Brushing teeth","Scrolling"],["Chess","Monopoly"],["Inception","Cats"]];QUES.forEach(function(q,i){if(a[i]){QANS[q[0]]=a[i][0];QANS[q[1]]=a[i][1]}})})();
-function tipHtml(isImp,anyImp,pk,md){
-  if(!pk||md==="age")return"";
+function tipData(isImp,anyImp,pk,md){
+  if(!pk||md==="age")return null;
   var role=isImp?"You’re the imposter":anyImp?"You’re crew":"You’re crew (nobody is the imposter)",best,alt="",avoid="",why;
   if(md==="under"){best=PCL[pk.a+"|"+pk.b]||PCL[pk.b+"|"+pk.a]||"Something both words share";why="Fits both words, so it blends in either way."}
   else if(md==="quest"){best=QANS[isImp?pk.b:pk.a]||"Depends";why="Matches your question. Keep it to 1 to 3 words."}
@@ -316,9 +366,61 @@ function tipHtml(isImp,anyImp,pk,md){
     if(isImp){best=k[1]||k[0];alt=k[1]?k[0]:"";why="Sounds like you know the word without giving much away."}
     else{best=k[0];alt=k[1]||"";avoid=k[2]||"";why="Vague enough that the imposter can’t guess the word."}
   }
-  return'<div class="tip"><div class="tr">Rohan hint · '+esc(role)+'</div><div class="tw">'+esc(best)+'</div><small>'+esc(why)+'</small>'+
-    (alt?'<small>Backup: <b>'+esc(alt)+'</b></small>':'')+(avoid?'<small>Too revealing, skip: '+esc(avoid)+'</small>':'')+'</div>';
+  return{role:role,best:best,alt:alt,avoid:avoid,why:why};
 }
+function tipHtml(isImp,anyImp,pk,md,canSend){
+  var d=tipData(isImp,anyImp,pk,md);if(!d)return"";
+  var ch=[d.best,d.alt].filter(Boolean).map(function(w){return'<button data-a="say" data-v="'+esc(w)+'">'+esc(w)+'</button>'}).join("");
+  return'<div class="tip"><div class="tr">Rohan hint · '+esc(d.role)+'</div><div class="tw">'+esc(d.best)+'</div><small>'+esc(d.why)+'</small>'+
+    (d.alt?'<small>Backup: <b>'+esc(d.alt)+'</b></small>':'')+(d.avoid?'<small>Too revealing, skip: '+esc(d.avoid)+'</small>':'')+
+    (canSend?'<div class="chips">'+ch+'</div><small>Tap a word to send it in the chat</small>':'')+'</div>';
+}
+function av(n){var h=0,s=String(n);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return'<span class="av" style="background:hsl('+h+',52%,42%)">'+esc(s.charAt(0).toUpperCase())+'</span>'}
+var LINES={imp:["Yeah, that’s pretty common honestly","Easy to picture, hard to describe","I’d rather not make it too obvious"],crew:["Mine’s pretty straightforward","I’ll keep it simple for now","Not going to say too much yet"]};
+function notesBody(c){
+  var r=c.r,us=c.us,al=c.al,im=c.im,ph=c.ph,out=c.out,v=r.votes||{},me=O.uid,isI=im.indexOf(me)>=0,pk=(r.secret||{}).pick,h="";
+  var can=!out&&(ph==="chat"||ph==="vote"),d=tipData(isI,im.length>0,pk,r.mode);
+  var chip=function(w){return'<button data-a="say" data-v="'+esc(w)+'">'+esc(w)+'</button>'};
+  if(d&&ph!=="reveal"){
+    h+='<div class="ks"><div class="kl">Hint · '+esc(d.role)+'</div><div style="font-size:28px;font-weight:800;text-align:center;margin:4px 0;word-break:break-word">'+esc(d.best)+'</div><div class="kn" style="text-align:center">'+esc(d.why)+(d.alt?' Backup: '+esc(d.alt)+'.':'')+(d.avoid?' Skip: '+esc(d.avoid)+'.':'')+'</div>';
+    if(can)h+='<div class="chips">'+[d.best,d.alt].filter(Boolean).map(chip).join("")+'</div><div class="kl" style="margin-top:12px">Natural lines</div><div class="chips" style="justify-content:flex-start;margin-top:0">'+(isI?LINES.imp:LINES.crew).map(chip).join("")+'</div><div class="kn">Taps send after a random 1 to 3 second delay.</div>';
+    h+='</div>';
+  }
+  h+='<div class="ks"><div class="kl">Who is who</div>'+us.map(function(u){var p=r.players[u],x=im.indexOf(u)>=0;return'<div class="kr"><span'+(p.alive===false?' class="dim"':'')+'>'+esc(p.name)+(p.alive===false?' · out':'')+'</span><em class="bd '+(x?'bi':'bc')+'">'+(x?'imposter':'crew')+'</em></div>'}).join("")+'<div class="kn">'+esc(info(r))+'</div></div>';
+  var cnt={};al.forEach(function(u){var t=v[u];if(t)cnt[t]=(cnt[t]||0)+1});
+  var pool=al.filter(function(u){return u!==me}),tg=null,why;
+  if(isI){var cr=pool.filter(function(u){return im.indexOf(u)<0});cr.sort(function(x,y){return(cnt[y]||0)-(cnt[x]||0)});if(cr.length){tg=cr[0];why="Crew. Go with the crowd, then steer to them."}else why="Only imposters are left. Stay quiet."}
+  else{var ip=pool.filter(function(u){return im.indexOf(u)>=0});if(ip.length){tg=ip[0];why="Imposter. Vote them out."}else why="No imposter among the living."}
+  h+='<div class="ks"><div class="kl">Best vote</div>';
+  if(tg)h+='<div class="kr"><span><b>'+esc(r.players[tg].name)+'</b><br><small>'+why+'</small></span>'+(ph==="vote"&&!out?'<button class="kb" data-a="vote" data-v="'+tg+'">Vote</button>':'')+'</div>';
+  else h+='<div class="kn">'+why+'</div>';
+  h+='</div>';
+  if(ph!=="reveal"){
+    var ch=O.chat||{},nm=O.name.toLowerCase(),acc={},sp={},ma=0,va=cnt[me]||0;
+    Object.keys(ch).forEach(function(k){var m=ch[k];sp[m.u]=1;if(m.u!==me&&String(m.t).toLowerCase().indexOf(nm)>=0){acc[m.n]=(acc[m.n]||0)+1;ma++}});
+    var lvl=ma+va<1?"Low":ma+va<3?"Medium":"High",quiet=al.filter(function(u){return u!==me&&!sp[u]}).map(function(u){return r.players[u].name});
+    h+='<div class="ks"><div class="kl">Heat on you: <b>'+lvl+'</b></div><div class="kn">'+(ma?'Named you: '+Object.keys(acc).map(function(n){return esc(n)+' ×'+acc[n]}).join(", "):'Nobody has named you in the chat')+(ph==="vote"?'<br>Votes on you: '+va:'')+(quiet.length?'<br>Not spoken yet: '+quiet.map(esc).join(", "):'')+'</div></div>';
+  }
+  if(ph==="vote")h+='<div class="ks"><div class="kl">Live votes (only you can see this)</div>'+al.map(function(w){var t=v[w];return'<div class="kr"><span>'+esc(r.players[w].name)+'</span><span>'+(t&&r.players[t]?esc(r.players[t].name):'—')+'</span></div>'}).join("")+'</div>';
+  if(ph==="reveal"&&!out)h+='<div class="ks"><button class="kb wide" data-a="swap">'+(isI?"Make me crew":"Make me imposter")+'</button></div>';
+  h+='<div class="ks"><button class="np wide" data-a="risk">'+(O.risk?'Hide risky tools':'Risky tools (others can notice)')+'</button>';
+  if(O.risk){
+    if(ph==="vote")h+='<div class="kl" style="margin-top:10px">Edit votes</div>'+al.map(function(w){return'<div class="kr"><span>'+esc(r.players[w].name)+' votes for</span><select data-w="'+w+'" style="width:auto;min-width:110px"><option value="">—</option>'+al.filter(function(t){return t!==w}).map(function(t){return'<option value="'+t+'"'+(v[w]===t?' selected':'')+'>'+esc(r.players[t].name)+'</option>'}).join("")+'</select></div>'}).join("");
+    if(out)h+='<button class="kb wide" style="margin-top:10px" data-a="revive">Revive me</button>';
+    if(ph!=="vote"&&!out)h+='<div class="kn">Edit votes shows up in the vote phase.</div>';
+  }
+  return h+'</div>';
+}
+function notes(c){
+  O.nctx=c;var open=O.pin||O.pk;
+  return'<div class="nt"><div class="nh"><button class="nb" data-hold="1">Notes</button><button class="np" data-a="pin">'+(O.pin?'Unpin':'Pin')+'</button></div><div class="nbody'+(open?'':' hide')+'" id="nbody">'+notesBody(c)+'</div></div>';
+}
+function holdNotes(on){
+  O.pk=on;var b=$("nbody");clearTimeout(O.pt);
+  if(on){if(O.nctx&&b)b.innerHTML=notesBody(O.nctx);O.pt=setTimeout(function(){holdNotes(false)},10000)}
+  if(b)b.classList.toggle("hide",!(on||O.pin));
+}
+function hideNotes(){O.pin=false;O.risk=false;holdNotes(false)}
 function setAt(path,val){
   if(!path.length)return;
   var o=ST;
@@ -382,18 +484,22 @@ function ocard(r,us){
 }
 function cardHtml(c){return'<div class="oc'+(c.imp?' imp':'')+'" data-a="peek"><div class="role">'+esc(c.role)+'</div><div class="word'+(c.sm?' sm':'')+'">'+esc(c.big)+'</div><div class="hint" style="white-space:pre-line">'+esc(c.sub)+'</div>'+(c.cheat.length?'<div class="cl">'+esc(c.cheat.join("\n"))+'</div>':'')+'</div>'}
 function info(r){var p=(r.secret||{}).pick||{};return r.mode==="under"?"Crew word: "+p.a+" | Imposter word: "+p.b:r.mode==="quest"?"Crew: "+p.a+" | Imposter: "+p.b:"The word was "+p.a}
-function rolesBlock(r,us){var im=(r.secret||{}).imps||[];return'<div style="margin-top:8px">'+us.map(function(u){return'<div class="pl">'+esc(r.players[u].name)+' — '+(im.indexOf(u)>=0?'<b style="color:var(--ac2)">imposter</b>':'crew')+'</div>'}).join("")+'</div><div class="hint">'+esc(info(r))+'</div>'}
-function resBlock(r){var x=r.result;if(!x)return"";return'<p style="margin:8px 0;color:var(--mu)">'+(x.none?"Last vote: a tie, nobody was eliminated.":esc(x.name)+" was eliminated ("+(x.was?"an imposter":"not the imposter")+").")+'</p>'}
+function wordCard(r){var p=(r.secret||{}).pick||{};
+  if(r.mode==="under")return'<div class="wd"><span>Crew word</span><b class="s">'+esc(p.a)+'</b><span style="margin-top:8px">Imposter word</span><b class="s">'+esc(p.b)+'</b></div>';
+  if(r.mode==="quest")return'<div class="wd"><span>Crew question</span><b class="s">'+esc(p.a)+'</b><span style="margin-top:8px">Imposter question</span><b class="s">'+esc(p.b)+'</b></div>';
+  return'<div class="wd"><span>The word was</span><b>'+esc(p.a)+'</b></div>'}
+function rolesBlock(r,us){var im=(r.secret||{}).imps||[];return us.map(function(u){var p=r.players[u],x=im.indexOf(u)>=0;return'<div class="pr'+(x?' i':'')+'">'+av(p.name)+'<div class="nm">'+esc(p.name)+(u===r.host?' 👑':'')+(p.alive===false?'<small>Eliminated</small>':'')+'</div><em class="bd '+(x?'bi':'bc')+'">'+(x?'Imposter':'Crew')+'</em></div>'}).join("")+wordCard(r)}
+function resBlock(r){var x=r.result;if(!x)return"";return'<p class="lv">'+(x.none?"Last vote: a tie, nobody was eliminated.":"Last vote: "+esc(x.name)+" was eliminated ("+(x.was?"an imposter":"not the imposter")+").")+'</p>'}
 
 function vRoom(){
   var r=O.room;if(!r)return'<div class="panel">Joining…</div>';
   if(!r.players||!r.players[O.uid])return'<div class="panel">You’re not in this room.<button class="btn alt" data-a="leave">Back</button></div>';
   var us=order(r),isH=r.host===O.uid,ph=r.phase,al=aliveList(r),me=r.players[O.uid],out=me.alive===false,rohan=O.name.toLowerCase()==="rohan",im=(r.secret||{}).imps||[];
-  var h='<div class="panel"><div class="role">Room '+O.code+' · '+modeName(r.mode)+(ph!=="lobby"&&r.round?' · Round '+r.round:'')+'</div>';
-  var list=us.map(function(u){var p=r.players[u];return'<div class="pl'+(p.alive===false?' out':'')+'">'+esc(p.name)+(u===r.host?' 👑':'')+'</div>'}).join("");
+  var h='<div class="panel"><div class="rh"><span>'+esc(O.code)+'</span><span>'+esc(modeName(r.mode))+'</span>'+(ph!=="lobby"&&r.round?'<span>Round '+r.round+'</span>':'')+'</div>';
+  var list=us.map(function(u){var p=r.players[u];return'<div class="pl'+(p.alive===false?' out':'')+'">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+'</span></div>'}).join("");
   var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
   if(ph==="lobby"){
-    var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</div>'}).join("");
+    var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</span></div>'}).join("");
     h='<div class="panel"><div class="rc"><div class="lb">Room code</div><button class="code" data-a="copy" data-v="'+esc(O.code)+'">'+esc(O.code)+'</button><div class="lb2">'+(O.cp?'Copied. Send it to your friends':'Tap the code to copy it')+'</div></div>'+
       '<div class="pc"><b>'+nj+' of 6 players joined</b><span>'+(nj<3?'Need '+(3-nj)+' more to start':'Ready to start')+'</span></div>'+pls;
     if(!isH)h+='<p class="sub" style="margin:10px 0 0">Mode: '+esc(modeName(r.mode))+'</p>';
@@ -402,7 +508,8 @@ function vRoom(){
     return h+leave;
   }
   if(ph==="over"){
-    h+='<p style="font-size:20px;font-weight:800;margin:6px 0">'+(r.winner==="crew"?"Crew wins! The imposter was found.":r.winner==="imps"?"The imposter wins! Only 2 players remain.":"Nobody was the imposter this time.")+'</p>'+resBlock(r)+rolesBlock(r,us);
+    var wn=r.winner==="crew"?["crew","Crew wins","The imposter was found."]:r.winner==="imps"?["imp","Imposter wins","Only 2 players remain."]:["none","No imposter this time","Nobody was faking it."];
+    h+='<div class="win '+wn[0]+'"><h2>'+wn[1]+'</h2><p>'+wn[2]+'</p></div>'+resBlock(r)+rolesBlock(r,us);
     if(isH)h+='<button class="btn" data-a="again">Play again</button>';
     return h+leave;
   }
@@ -410,9 +517,7 @@ function vRoom(){
   else{
     h+=O.show?cardHtml(ocard(r,us)):'<div class="oc" data-a="peek"><div class="word sm">Tap to see your card</div><div class="hint">Make sure nobody is looking</div></div>';
     if(O.show)h+='<div class="hint" style="text-align:center;font-size:12px;margin-top:6px">Tap the card to hide it</div>';
-    if(rohan&&ph==="reveal")h+='<div class="cm"><button data-a="swap">'+(im.indexOf(O.uid)>=0?"Make me crew":"Make me imposter")+'</button></div>';
   }
-  if(rohan&&(ph==="chat"||ph==="vote"))h+=tipHtml(im.indexOf(O.uid)>=0,im.length>0,(r.secret||{}).pick,r.mode);
   if(ph==="reveal"){
     var rd=r.ready||{},n=al.filter(function(u){return rd[u]}).length;
     if(!rd[O.uid]&&!out)h+='<button class="btn" data-a="ready">I’m ready</button>';
@@ -427,8 +532,8 @@ function vRoom(){
     if(!out)h+=al.filter(function(u){return u!==O.uid}).map(function(u){return'<button class="rr'+(v[O.uid]===u?' on':'')+'" data-a="vote" data-v="'+u+'"><b>'+esc(r.players[u].name)+'</b></button>'}).join("");
     h+='<p class="sub" style="margin:10px 0 0">'+c+'/'+al.length+' voted</p>';
     if(isH)h+='<button class="btn" data-a="count">Count votes</button>';
-    if(rohan)h+='<div class="cheats" style="margin-top:12px"><b>Rohan cheats: edit votes</b>'+al.map(function(w){return'<div style="margin-top:8px;font-size:14px">'+esc(r.players[w].name)+' votes for<select data-w="'+w+'"><option value="">—</option>'+al.filter(function(t){return t!==w}).map(function(t){return'<option value="'+t+'"'+(v[w]===t?' selected':'')+'>'+esc(r.players[t].name)+'</option>'}).join("")+'</select></div>'}).join("")+'</div>';
   }
+  if(rohan&&(ph==="reveal"||ph==="chat"||ph==="vote"))h+=notes({r:r,us:us,al:al,im:im,ph:ph,out:out});
   return h+leave;
 }
 function draw(){
@@ -443,8 +548,9 @@ function showChat(c){
   var k=Object.keys(c).sort(),last=k[k.length-1]||"";
   if(k.length===O.nm&&last===O.lk)return;
   O.nm=k.length;O.lk=last;var el=$("msgs");
-  el.innerHTML=k.slice(-80).map(function(i){var m=c[i];return'<div class="m"><b>'+esc(m.n)+':</b> '+esc(m.t)+'</div>'}).join("");
+  el.innerHTML=k.slice(-80).map(function(i){var m=c[i],me=m.u===O.uid;return'<div class="b'+(me?' me':'')+'">'+(me?'':av(m.n))+'<div class="bt">'+(me?'':'<i>'+esc(m.n)+'</i>')+esc(m.t)+'</div></div>'}).join("");
   el.scrollTop=el.scrollHeight;
+  if(O.nctx&&(O.pin||O.pk)&&$("nbody"))$("nbody").innerHTML=notesBody(O.nctx);
 }
 function poll(){
   if(O.busy)return;
@@ -452,11 +558,11 @@ function poll(){
     O.busy=1;get(rp()).then(function(r){
       O.busy=0;if(O.view!=="room")return;
       if(!r){leaveLocal();dropPeer();O.msg="Room closed";draw();return}
-      var chat=r.chat||{};delete r.chat;
+      var chat=r.chat||{};delete r.chat;O.chat=chat;
       if(P.host&&(r.phase!==O.ap||(r.phase==="lobby"&&Date.now()-O.an>15000))){O.ap=r.phase;O.an=Date.now();announce()}
       showChat(chat);
       var s=JSON.stringify(r);
-      if(s!==O.sig){O.sig=s;O.room=r;if(r.phase!==O.ph){O.ph=r.phase;if(r.phase==="reveal"||r.phase==="lobby")O.show=false}draw()}
+      if(!O.pk&&s!==O.sig){O.sig=s;O.room=r;if(r.phase!==O.ph){O.ph=r.phase;if(r.phase==="reveal"||r.phase==="lobby")O.show=false}draw()}
     }).catch(function(){O.busy=0});
   }
 }
@@ -546,6 +652,8 @@ function tally(r){
 function act(a,v){
   if(a==="back"){leaveLocal();show("setup");return}
   if(a==="copy"){try{navigator.clipboard.writeText(v)}catch(e){}O.cp=true;O.sig="";draw();setTimeout(function(){O.cp=false;draw()},1800);return}
+  if(a==="pin"){O.pin=!O.pin;O.sig="";draw();return}
+  if(a==="risk"){O.risk=!O.risk;O.sig="";draw();return}
   if(a==="home"){O.view="home";O.sig="";O.msg="";draw();return}
   if(typeof Peer==="undefined"&&a!=="list"){oshow("PeerJS didn’t load. Allow cdnjs or paste the PeerJS library into the file.");return}
   O.msg="";var r=O.room,me=r&&r.players&&r.players[O.uid];
@@ -563,6 +671,8 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     leaveLocal();draw();return;
   }
   if(a==="peek"){if(me.alive===false)return;if(!O.show){O.show=true;put(rp()+"/seen/"+O.uid,true).catch(function(){})}else O.show=false;draw();return}
+  if(a==="say"){if(me.alive!==false){var tx=String(v).slice(0,200),nm2=O.name,u2=O.uid,cd=O.code;setTimeout(function(){if(O.code===cd)wr(push("rooms/"+cd+"/chat",{u:u2,n:nm2,t:tx}))},900+Math.random()*1900)}return}
+  if(a==="revive"){wr(put(rp()+"/players/"+O.uid+"/alive",true));return}
   if(a==="ready"){wr(put(rp()+"/ready/"+O.uid,true));return}
   if(a==="vote"){wr(put(rp()+"/votes/"+O.uid,v));return}
   if(a==="swap"){
@@ -607,6 +717,13 @@ function send(){
 $("cs").onclick=send;
 $("ci").onkeydown=function(e){if(e.key==="Enter")send()};
 $("goOnline").onclick=function(){O.view="home";O.sig="";show("online");draw()};
+
+$("ovMain").addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest("[data-hold]"))holdNotes(true)});
+$("ovMain").addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("[data-hold]"))e.preventDefault()});
+["pointerup","pointercancel","touchend","touchcancel","mouseup"].forEach(function(n){document.addEventListener(n,function(){if(O.pk)holdNotes(false)},true)});
+document.addEventListener("visibilitychange",function(){if(document.hidden)hideNotes()});
+document.querySelector("h1").onclick=hideNotes;
+$("ovMain").addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-a="say"]');if(t)t.style.opacity=".35"});
 </script>
 </body>
 </html>
