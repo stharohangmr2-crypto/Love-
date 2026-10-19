@@ -155,6 +155,32 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 .drow .btn:disabled{opacity:.4}
 .dword{margin-top:10px;padding:10px 12px;border:1px dashed var(--ch);border-radius:12px;text-align:center;font-size:15px}
 .err.cerr{margin:0 0 8px}
+.ur{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.up{flex:1 1 88px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);text-align:center}
+.up.now{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac) inset}
+.up .un{font-size:13px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up .un small{font-weight:400;color:var(--mu)}
+.up .uk{font-size:12px;color:var(--mu)}
+.up .uk.u1{color:var(--ac2);font-weight:700}
+.ut{display:flex;gap:16px;justify-content:center;align-items:center;margin:6px 0 10px}
+.uc{width:56px;height:80px;border-radius:10px;border:2px solid #fff;color:#fff;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.uc b{font-size:24px;font-weight:800;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.uc.big{width:84px;height:120px;border-radius:14px}
+.uc.big b{font-size:38px}
+.uc small{font-size:12px;opacity:.9;margin-top:5px}
+.uR{background:#e5484d}.uG{background:#30a46c}.uB{background:#3e63dd}.uY{background:#f5a524;color:#1d1b22}
+.uY b{text-shadow:none}
+.uW{background:conic-gradient(#e5484d 0 25%,#f5a524 0 50%,#30a46c 0 75%,#3e63dd 0)}
+.uback{background:#1d1b22;border-color:var(--ac2)}
+.uc.no{opacity:.4}
+.uc.ok{box-shadow:0 0 0 3px var(--ac),0 4px 10px rgba(0,0,0,.3);transform:translateY(-4px)}
+.uc:disabled{cursor:default}
+.uh{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px;padding:6px 0}
+.ust{text-align:center;font-size:14px;color:var(--mu);margin:0 0 4px;min-height:20px}
+.utn{text-align:center;font-size:18px;font-weight:800;margin:4px 0}
+.upick{display:flex;gap:8px;margin:10px 0}
+.upick button{flex:1;height:46px;border-radius:12px;border:2px solid #fff;color:#fff;font:inherit;font-weight:700;font-size:14px}
+.upick button.uY{color:#1d1b22}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -235,7 +261,8 @@ var MODES=[
 {id:"age",n:"Guess the Age",d:"One player has a secret age. Everyone else asks questions to guess it"},
 {id:"draw",n:"Draw It",d:"Everyone adds strokes to a shared drawing. The imposter doesn’t know the word",o:1},
 {id:"emoji",n:"Emoji Only",d:"Describe the word with up to 3 emojis. The imposter only sees the category",o:1},
-{id:"last",n:"Last Letter",d:"Imposter knows only the first letter. One word each, and the imposter can guess",o:1}];
+{id:"last",n:"Last Letter",d:"Imposter knows only the first letter. One word each, and the imposter can guess",o:1},
+{id:"uno",n:"UNO",d:"Classic UNO. 2 to 6 players, online only",o:1}];
 var CATS={"Pizza":"Food","Elephant":"Animal","Guitar":"Instrument","Hospital":"Place","Football":"Sport","Airplane":"Transport","Library":"Place","Ocean":"Nature","Birthday":"Event","Doctor":"Job","Volcano":"Nature","Cinema":"Place","Bicycle":"Transport","Snowman":"Winter","Pirate":"Character","Chess":"Game","Coffee":"Drink","Rainbow":"Nature","Astronaut":"Job","Castle":"Place","Ninja":"Character","Sushi":"Food","Camera":"Object","Desert":"Nature","Robot":"Machine","Dragon":"Creature","Lighthouse":"Building","Piano":"Instrument","Tiger":"Animal","Rocket":"Transport","Mountain":"Nature","Samurai":"Character","Fireworks":"Event","School":"Place","Wedding":"Event"};
 var RULES={classic:"Describe the word in one sentence each, then vote out the imposter.",blind:"Describe the word in one sentence each. The imposter is totally blind, so listen closely.",double:"Describe the word in one sentence each. Two of you are faking it.",under:"Describe your word in one sentence each. Someone has a different word and doesn’t know it.",quest:"Say your answer out loud, one by one. Someone answered a different question.",chaos:"Describe the word in one sentence each. There might be no imposter at all.",age:"Everyone knows who the age holder is. Ask them questions, then each player guesses their age.",draw:"Take turns adding strokes to the shared drawing, then discuss and vote. Someone doesn’t know the word and is faking it.",emoji:"Chat with up to 3 emojis only. Someone only knows the category, so watch for vague ones.",last:"Say one word that goes with the secret word. The imposter only knows its first letter and gets one guess."};
 var rohanI=-1,N=4,mode="classic",players=[],imps=[],pick=null,idx=0,shown=false,ch={};
@@ -551,6 +578,143 @@ function wordCard(r){var p=(r.secret||{}).pick||{};
 function rolesBlock(r,us){var im=(r.secret||{}).imps||[];return us.map(function(u){var p=r.players[u],x=im.indexOf(u)>=0;return'<div class="pr'+(x?' i':'')+'">'+av(p.name)+'<div class="nm">'+esc(p.name)+(u===r.host?' 👑':'')+(p.alive===false?'<small>Eliminated</small>':'')+'</div><em class="bd '+(x?'bi':'bc')+'">'+(x?'Imposter':'Crew')+'</em></div>'}).join("")+wordCard(r)}
 function resBlock(r){var x=r.result;if(!x)return"";return'<p class="lv">'+(x.none?"Last vote: a tie, nobody was eliminated.":"Last vote: "+esc(x.name)+" was eliminated ("+(x.was?"an imposter":"not the imposter")+").")+'</p>'}
 
+/* ===== UNO (online only). Same host-authoritative room as the other modes ===== */
+var UCOL={R:"Red",Y:"Yellow",G:"Green",B:"Blue"};
+function ushuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function unoDeck(){
+  var d=[];
+  ["R","Y","G","B"].forEach(function(c){
+    d.push(c+"0");
+    for(var i=1;i<=9;i++)d.push(c+i,c+i);
+    ["S","V","D"].forEach(function(x){d.push(c+x,c+x)});
+  });
+  for(var i=0;i<4;i++)d.push("W","F");
+  return ushuf(d);
+}
+function unoWild(c){return c==="W"||c==="F"}
+function unoLbl(c){var v=c.slice(1);return c==="F"?"+4":c==="W"?"★":v==="S"?"⊘":v==="V"?"⇄":v==="D"?"+2":v}
+function unoNm(c){if(c==="W")return"Wild";if(c==="F")return"Wild +4";var v=c.slice(1);return UCOL[c[0]]+" "+(v==="S"?"Skip":v==="V"?"Reverse":v==="D"?"+2":v)}
+function unoOk(c,top,col,pend){
+  if(pend>0){return top==="F"?c==="F":(c!=="F"&&!unoWild(c)&&c.slice(1)==="D")}
+  return unoWild(c)||c[0]===col||(!unoWild(top)&&c.slice(1)===top.slice(1))}
+function unoNext(us,cur,dir,k){var n=us.length,i=us.indexOf(cur);return us[(((i+dir*k)%n)+n)%n]}
+function unoTake(u,k){
+  var got=[];
+  for(var i=0;i<k;i++){
+    if(!u.deck.length&&u.disc.length>1){var top=u.disc.pop();u.deck=ushuf(u.disc);u.disc=[top]}
+    if(!u.deck.length)break;
+    got.push(u.deck.pop());
+  }
+  return got;
+}
+function unoStart(r){
+  var us=order(r),d=unoDeck(),h={};
+  us.forEach(function(x){h[x]=d.splice(0,7)});
+  var si=0;for(var i=0;i<d.length;i++){if(/^[RYGB][0-9]$/.test(d[i])){si=i;break}}
+  var s=d.splice(si,1)[0];
+  O.uk="";O.uw="";
+  return{phase:"uno",uno:{hands:h,deck:d,disc:[s],turn:us[Math.floor(Math.random()*us.length)],dir:1,col:s[0],drew:null,pend:0,last:"Game on. Match the color or the number.",win:null},
+    secret:null,seen:null,ready:null,votes:null,chat:null,round:null,result:null,winner:null,why:null,guessed:null,dr:null};
+}
+function unoSend(r,nu,extra){
+  var u=r.uno,k=u.disc.length+":"+u.deck.length+":"+(u.drew||"")+":"+u.turn+":"+((u.hands[O.uid]||[]).length);
+  if(O.uk===k)return;
+  O.uk=k;
+  var o={uno:nu};if(extra)Object.keys(extra).forEach(function(x){o[x]=extra[x]});
+  upd(o);
+}
+function unoAct(a,v,r,host){
+  var u=r.uno;
+  if(a==="uno_cancel"){O.uw="";O.sig="";draw();return}
+  if(a==="uno_rematch"){if(host)upd(unoStart(r));return}
+  if(!u||r.phase!=="uno")return;
+  var us=order(r),me=O.uid,nu=JSON.parse(JSON.stringify(u)),top=u.disc[u.disc.length-1];
+  var nm=function(x){return r.players[x]?r.players[x].name:"?"},my=nm(me);
+  if(a==="uno_skip"){
+    if(!host)return;
+    if(u.pend>0){nu.hands[u.turn]=nu.hands[u.turn].concat(unoTake(nu,u.pend));nu.last=nm(u.turn)+" was skipped by the host and drew "+u.pend;nu.pend=0}
+    else nu.last=nm(u.turn)+" was skipped by the host";
+    nu.turn=unoNext(us,u.turn,u.dir,1);nu.drew=null;
+    O.uw="";unoSend(r,nu);return;
+  }
+  if(u.turn!==me)return;
+  var hand=nu.hands[me]||[];
+  if(a==="uno_draw"){
+    if(u.drew)return;
+    if(u.pend>0){
+      var pg=unoTake(nu,u.pend);
+      nu.hands[me]=hand.concat(pg);
+      nu.last=my+" drew "+pg.length+" and lost the turn";nu.pend=0;nu.turn=unoNext(us,me,u.dir,1);
+      O.uw="";unoSend(r,nu);return;
+    }
+    var got=unoTake(nu,1);
+    if(!got.length){nu.last=my+" couldn’t draw, the pile is empty";nu.turn=unoNext(us,me,u.dir,1)}
+    else{
+      hand.push(got[0]);
+      if(unoOk(got[0],top,u.col)){nu.drew=got[0];nu.last=my+" drew a card"}
+      else{nu.last=my+" drew a card and passed";nu.turn=unoNext(us,me,u.dir,1)}
+    }
+    O.uw="";unoSend(r,nu);return;
+  }
+  if(a==="uno_pass"){
+    if(!u.drew)return;
+    nu.drew=null;nu.last=my+" passed";nu.turn=unoNext(us,me,u.dir,1);
+    O.uw="";unoSend(r,nu);return;
+  }
+  if(a==="uno_play"||a==="uno_wild"){
+    var card=a==="uno_wild"?O.uw:v,col=a==="uno_wild"?v:null,i=hand.indexOf(card);
+    if(i<0||!unoOk(card,top,u.col,u.pend)||(u.drew&&u.drew!==card))return;
+    if(unoWild(card)&&!col){O.uw=card;O.sig="";draw();return}
+    O.uw="";
+    hand.splice(i,1);
+    nu.disc.push(card);nu.drew=null;
+    var d=u.dir,n=us.length,msg=my+" played "+unoNm(card),nx=unoNext(us,me,d,1),t=card.slice(1);
+    nu.col=unoWild(card)?col:card[0];
+    if(unoWild(card))msg+=" ("+UCOL[col]+")";
+    if(card==="F"||t==="D"){nu.pend=(u.pend||0)+(card==="F"?4:2);msg+=". "+nm(nx)+" must stack a "+(card==="F"?"+4":"+2")+" or draw "+nu.pend}
+    else if(t==="S"){msg+=". "+nm(nx)+" is skipped";nx=unoNext(us,me,d,2)}
+    else if(t==="V"){nu.dir=-d;if(n===2){nx=me;msg+=". "+nm(unoNext(us,me,d,1))+" is skipped"}else nx=unoNext(us,me,-d,1)}
+    if(!hand.length){nu.win=me;nu.pend=0;nu.turn=null;nu.last=msg+". "+my+" wins!";unoSend(r,nu,{phase:"unoend"});return}
+    if(hand.length===1)msg+=". UNO!";
+    nu.last=msg;nu.turn=nx;
+    unoSend(r,nu);
+  }
+}
+function ucardH(c,extra,att){
+  return'<button class="uc '+(unoWild(c)?'uW':'u'+c[0])+(extra||'')+'" '+(att||'')+'><b>'+unoLbl(c)+'</b></button>';
+}
+function vUno(r,us,isH){
+  var u=r.uno||{hands:{},deck:[],disc:["R0"]},me=O.uid,hand=(u.hands[me]||[]).slice().sort(),top=u.disc[u.disc.length-1];
+  var over=r.phase==="unoend",myT=!over&&u.turn===me,nm=function(x){return r.players[x]?r.players[x].name:"?"};
+  var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
+  var h='<div class="panel"><div class="rh"><span>'+esc(O.code)+'</span><span>UNO</span>'+(over?'':'<span>'+(u.dir===1?'↻ clockwise':'↺ counter-clockwise')+'</span>')+'</div>';
+  h+='<div class="ur">'+us.map(function(x){
+    var c=(u.hands[x]||[]).length;
+    return'<div class="up'+(!over&&x===u.turn?' now':'')+'">'+av(nm(x))+'<div class="un">'+esc(nm(x))+(x===me?' <small>you</small>':'')+(x===r.host?' 👑':'')+'</div><div class="uk'+(c===1?' u1':'')+'">'+(c===1?'UNO! 1 card':c+' cards')+'</div></div>';
+  }).join("")+'</div>';
+  if(over){
+    var win=u.win===me;
+    h+='<div class="win '+(win?'crew':'imp')+'"><h2>'+(win?'You win!':esc(nm(u.win))+' wins')+'</h2><p>'+esc(u.last||"")+'</p></div>';
+    h+=isH?'<button class="btn" data-a="uno_rematch">Rematch</button><button class="btn alt" data-a="again">Back to lobby</button>':'<p class="sub" style="margin:10px 0 0">Waiting for the host to start the next game…</p>';
+    return h+leave;
+  }
+  var canDraw=myT&&!u.drew;
+  h+='<div class="ut"><button class="uc big uback'+(canDraw?' ok':' no')+'" '+(canDraw?'data-a="uno_draw"':'disabled')+'><b>UNO</b><small>'+(myT&&u.pend>0?'draw '+u.pend:u.deck.length+' left')+'</small></button>'+
+    '<div class="uc big u'+u.col+'"><b>'+unoLbl(top)+'</b><small>'+UCOL[u.col]+'</small></div></div>';
+  h+=(u.pend>0?'<p class="ust" style="color:var(--ac2);font-weight:700">+'+u.pend+' pending. '+(myT?'Stack a '+(top==='F'?'+4':'+2')+' or tap the deck to draw '+u.pend:'Stacking is on')+'</p>':'')+'<div class="utn">'+(myT?'Your turn':esc(nm(u.turn))+'’s turn')+'</div><p class="ust">'+esc(u.last||"")+'</p>';
+  if(O.uw&&myT&&hand.indexOf(O.uw)>=0){
+    h+='<div class="kl" style="text-align:center">Pick a color</div><div class="upick">'+["R","Y","G","B"].map(function(c){return'<button class="u'+c+'" data-a="uno_wild" data-v="'+c+'">'+UCOL[c]+'</button>'}).join("")+'</div><button class="btn alt" data-a="uno_cancel" style="margin-top:0">Cancel</button>';
+  }else if(myT&&u.drew){
+    h+='<p class="sub" style="text-align:center;margin:0">You can play the card you drew, or keep it and pass.</p><button class="btn alt" data-a="uno_pass" style="margin-top:8px">Keep it and pass</button>';
+  }
+  h+='<div class="uh">'+hand.map(function(c){
+    var ok=myT&&unoOk(c,top,u.col,u.pend)&&(!u.drew||u.drew===c);
+    return ucardH(c,ok?' ok':' no',ok?'data-a="uno_play" data-v="'+c+'"':'disabled');
+  }).join("")+'</div>';
+  h+='<p class="sub" style="margin:8px 0 0;font-size:12.5px;text-align:center">Match the color or the number. Wild cards can be played any time. Stacking: answer +2 with +2 and +4 with +4, or draw the total. Stuck? Draw a card. UNO is called for you.</p>';
+  if(isH&&!myT)h+='<button class="btn alt" data-a="uno_skip">Skip '+esc(nm(u.turn))+'’s turn</button>';
+  return h+leave;
+}
 function vRoom(){
   var r=O.room;if(!r)return'<div class="panel">Joining…</div>';
   if(!r.players||!r.players[O.uid])return'<div class="panel">You’re not in this room.<button class="btn alt" data-a="leave">Back</button></div>';
@@ -558,10 +722,11 @@ function vRoom(){
   var h='<div class="panel"><div class="rh"><span>'+esc(O.code)+'</span><span>'+esc(modeName(r.mode))+'</span>'+(ph!=="lobby"&&r.round?'<span>Round '+r.round+'</span>':'')+'</div>';
   var list=us.map(function(u){var p=r.players[u];return'<div class="pl'+(p.alive===false?' out':'')+'">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+'</span></div>'}).join("");
   var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
+  if(ph==="uno"||ph==="unoend")return vUno(r,us,isH);
   if(ph==="lobby"){
     var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</span></div>'}).join("");
     h='<div class="panel"><div class="rc"><div class="lb">Room code</div><button class="code" data-a="copy" data-v="'+esc(O.code)+'">'+esc(O.code)+'</button><div class="lb2">'+(O.cp?'Copied. Send it to your friends':'Tap the code to copy it')+'</div></div>'+
-      '<div class="pc"><b>'+nj+' of 6 players joined</b><span>'+(nj<3?'Need '+(3-nj)+' more to start':'Ready to start')+'</span></div>'+pls;
+      '<div class="pc"><b>'+nj+' of 6 players joined</b><span>'+(nj<(r.mode==="uno"?2:3)?'Need '+((r.mode==="uno"?2:3)-nj)+' more to start':'Ready to start')+'</span></div>'+pls;
     if(!isH)h+='<p class="sub" style="margin:10px 0 0">Mode: '+esc(modeName(r.mode))+'<br><span style="font-size:13px">'+esc(modeDesc(r.mode))+'</span></p>';
     if(isH)h+='<label class="t" style="margin-top:12px">Game mode</label><select id="om">'+OM.map(function(m){return'<option value="'+m.id+'"'+(m.id===r.mode?' selected':'')+'>'+m.n+'</option>'}).join("")+'</select><p class="sub" style="margin:8px 0 0;font-size:13px">'+esc(modeDesc(r.mode))+'</p><button class="btn" data-a="start">Start game</button>';
     else h+='<p class="sub" style="margin:10px 0 0">Waiting for the host to start…</p>';
@@ -734,6 +899,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
   if(a==="join"){joinRoom(v);return}
   if(!r||!me)return;
   var host=r.host===O.uid;
+  if(a.indexOf("uno_")===0){unoAct(a,v,r,host);return}
   if(a==="leave"){
     if(host)closeRoom();
     else{if(r.phase==="lobby")del(rp()+"/players/"+O.uid);dropPeer()}
@@ -766,6 +932,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
   if(a==="enddraw"){upd({phase:"chat"});return}
   if(a==="start"){
     var us=order(r),n=us.length,m=r.mode;
+    if(m==="uno"){if(n<2){oshow("Need at least 2 players");return}upd(unoStart(r));return}
     if(n<3){oshow("Need at least 3 players");return}
     if(m==="double"&&n<5){oshow("Double Trouble needs 5 or 6 players");return}
     var k=m==="double"?2:m==="chaos"?rnd([0,1,1,2]):1,sh=us.slice().sort(function(){return Math.random()-.5}),pk;
@@ -783,7 +950,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
   if(a==="tovote"){upd({phase:"vote",votes:null});return}
   if(a==="count"){tally(r);return}
   if(a==="again"){
-    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null,why:null,guessed:null,dr:null};
+    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null,why:null,guessed:null,dr:null,uno:null};
     order(r).forEach(function(u){u2["players/"+u+"/alive"]=true});upd(u2);
   }
 }
