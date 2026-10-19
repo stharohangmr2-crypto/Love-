@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Imposter</title>
+<meta name="theme-color" content="#14121b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Imposter">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <style>
 :root{--bg:#f4f1ea;--sf:#fff;--tx:#1d1b22;--mu:#6b6776;--ac:#6d4aff;--ac2:#ff4a6e;--ch:#b7791f;--bd:#ddd8e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14121b;--sf:#201c2c;--tx:#f1eefa;--mu:#9b95ad;--ch:#f6c453;--bd:#34304a}}
@@ -155,6 +162,8 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
   <div class="err" id="err"></div>
   <button class="btn" id="start">Start game</button>
   <button class="btn alt" id="goOnline">Play online (multiplayer)</button>
+  <button class="btn alt hide" id="install">Install app</button>
+  <p class="sub hide" id="iosnote" style="margin:12px 0 0;font-size:13px">To install on iPhone: tap Share, then Add to Home Screen.</p>
 </section>
 
 <section id="play" class="hide">
@@ -724,6 +733,38 @@ $("ovMain").addEventListener("contextmenu",function(e){if(e.target.closest&&e.ta
 document.addEventListener("visibilitychange",function(){if(document.hidden)hideNotes()});
 document.querySelector("h1").onclick=hideNotes;
 $("ovMain").addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-a="say"]');if(t)t.style.opacity=".35"});
+
+/* ===== INSTALL (PWA) ===== */
+var dip=null;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();dip=e;$("install").classList.remove("hide")});
+window.addEventListener("appinstalled",function(){dip=null;$("install").classList.add("hide")});
+$("install").onclick=function(){if(!dip)return;dip.prompt();dip.userChoice.then(function(){dip=null;$("install").classList.add("hide")})};
+function mkIcon(sz,mask){
+  var c=document.createElement("canvas");c.width=c.height=sz;var x=c.getContext("2d");
+  x.fillStyle="#14121b";x.fillRect(0,0,sz,sz);
+  var b=sz*(mask?.62:.8),o=(sz-b)/2;
+  x.fillStyle="#6d4aff";
+  if(mask)x.fillRect(0,0,sz,sz);
+  else{var r=b*.26;x.beginPath();x.moveTo(o+r,o);x.arcTo(o+b,o,o+b,o+b,r);x.arcTo(o+b,o+b,o,o+b,r);x.arcTo(o,o+b,o,o,r);x.arcTo(o,o,o+b,o,r);x.closePath();x.fill()}
+  x.fillStyle="#f1eefa";x.fillRect(o+.35*b,o+.217*b,.146*b,.566*b);
+  x.fillStyle="#ff4a6e";x.beginPath();x.arc(o+.663*b,o+.727*b,.055*b,0,6.2832);x.fill();
+  return c.toDataURL("image/png");
+}
+(function(){
+  var sa=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!sa)$("iosnote").classList.remove("hide");
+  if(!/^https?:/.test(location.protocol))return;
+  try{
+    /* manifest + icons are built here so everything stays in this one file */
+    var base=location.origin+location.pathname.replace(/[^\/]*$/,""),i192=mkIcon(192,false),i512=mkIcon(512,false),iM=mkIcon(512,true);
+    var m={id:base,name:"Imposter",short_name:"Imposter",description:"Pass the phone. Somebody is faking it.",start_url:location.origin+location.pathname,scope:base,display:"standalone",orientation:"portrait",background_color:"#14121b",theme_color:"#14121b",
+      icons:[{src:i192,sizes:"192x192",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"any"},{src:iM,sizes:"512x512",type:"image/png",purpose:"maskable"}]};
+    var add=function(rel,href){var l=document.createElement("link");l.rel=rel;l.href=href;document.head.appendChild(l)};
+    add("manifest",URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/manifest+json"})));
+    add("apple-touch-icon",mkIcon(180,false));
+    add("icon",i192);
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
