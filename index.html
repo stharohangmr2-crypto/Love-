@@ -2032,8 +2032,9 @@ function init(){
   var sun=new THREE.DirectionalLight(0xffffff,.8);sun.position.set(8,16,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
   var c=sun.shadow.camera;c.left=c.bottom=-9;c.right=c.top=9;c.far=50;S.sc.add(sun);
   var tb=new THREE.Mesh(new THREE.CylinderGeometry(7,7,.4,48),new THREE.MeshStandardMaterial({color:0x6b4426,roughness:.9}));tb.position.y=-.2;tb.receiveShadow=true;S.sc.add(tb);
-  var w=S.w=new CANNON.World();w.gravity.set(0,-30,0);w.solver.iterations=28;w.solver.tolerance=.0005;
+  var w=S.w=new CANNON.World();w.gravity.set(0,-30,0);w.solver.iterations=40;w.solver.tolerance=.0001;w.allowSleep=true;
   S.mat=new CANNON.Material();w.addContactMaterial(new CANNON.ContactMaterial(S.mat,S.mat,{friction:.55,restitution:0,contactEquationStiffness:1e8,contactEquationRelaxation:3}));
+  S.slick=new CANNON.Material();w.addContactMaterial(new CANNON.ContactMaterial(S.slick,S.mat,{friction:.02,restitution:0,contactEquationStiffness:1e8,contactEquationRelaxation:3}));
   var g=new CANNON.Body({mass:0,material:S.mat});g.addShape(new CANNON.Plane());g.quaternion.setFromEuler(-Math.PI/2,0,0);w.addBody(g);
   S.ray=new THREE.Raycaster();S.p2=new THREE.Vector2();S.tmp=new THREE.Vector3();S.qv=new THREE.Quaternion();S.vv=new THREE.Vector3();
   addEventListener("resize",resize);bind();
@@ -2043,8 +2044,8 @@ function build(){
   S.blocks.forEach(function(k){S.w.removeBody(k.b);S.sc.remove(k.m)});S.blocks=[];
   for(var i=0;i<JN;i++)for(var j=0;j<3;j++){
     var odd=i%2,sx=odd?JW:JL,sz=odd?JL:JW,o=(j-1)*(JW+.02),y=JH/2+i*(JH+.004);
-    var b=new CANNON.Body({mass:1,material:S.mat,linearDamping:.02,angularDamping:.08});
-    b.addShape(new CANNON.Box(new CANNON.Vec3(sx/2,JH/2,sz/2)));b.position.set(odd?o:0,y,odd?0:o);S.w.addBody(b);
+    var b=new CANNON.Body({mass:1,material:S.mat,linearDamping:.05,angularDamping:.15,allowSleep:true,sleepSpeedLimit:.15,sleepTimeLimit:.4});
+    b.addShape(new CANNON.Box(new CANNON.Vec3(sx/2,JH/2,sz/2)));b.position.set(odd?o:0,y,odd?0:o);S.w.addBody(b);b.sleep();
     var m=new THREE.Mesh(new THREE.BoxGeometry(sx,JH,sz),new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(.07+Math.random()*.03,.55,.48+Math.random()*.12),roughness:.85}));
     m.castShadow=m.receiveShadow=true;S.sc.add(m);S.blocks.push({b:b,m:m,layer:i,odd:!!odd,t:null,placed:false});
   }
@@ -2056,8 +2057,8 @@ function okD(d){return Array.isArray(d)&&d.length===S.blocks.length*7&&d.every(N
 function setT(d){S.blocks.forEach(function(k,i){k.t=d.slice(i*7,i*7+7).map(function(v){return v/1e3})})}
 function applyHard(d){S.blocks.forEach(function(k,i){var t=d.slice(i*7,i*7+7).map(function(v){return v/1e3}),q=new CANNON.Quaternion(t[3],t[4],t[5],t[6]);q.normalize();
   dyn(k);k.b.position.set(t[0],t[1],t[2]);k.b.quaternion.copy(q);k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp();k.t=null;k.placed=false});sync()}
-function kin(k){k.b.type=CANNON.Body.KINEMATIC;k.b.mass=0;k.b.updateMassProperties();k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0)}
-function dyn(k){if(k.b.type!==CANNON.Body.DYNAMIC){k.b.type=CANNON.Body.DYNAMIC;k.b.mass=1;k.b.updateMassProperties()}k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp()}
+function kin(k){k.b.material=S.slick;k.b.type=CANNON.Body.KINEMATIC;k.b.mass=0;k.b.updateMassProperties();k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0)}
+function dyn(k){k.b.material=S.mat;if(k.b.type!==CANNON.Body.DYNAMIC){k.b.type=CANNON.Body.DYNAMIC;k.b.mass=1;k.b.updateMassProperties()}k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp()}
 function lng(k){var v=new CANNON.Vec3(k.odd?0:1,0,k.odd?1:0),o=new CANNON.Vec3();k.b.quaternion.vmult(v,o);var l=Math.hypot(o.x,o.z)||1;return{x:o.x/l,z:o.z/l}}
 function topY(ex){var t=0;S.blocks.forEach(function(k){if(k!==ex&&k.b.position.y>t)t=k.b.position.y});return t}
 
@@ -2128,14 +2129,14 @@ function loop(t){
   if(!S.vis){S.raf=0;return}
   S.raf=requestAnimationFrame(loop);var dt=Math.min((t-S.last)/1000||.016,.05);S.last=t;
   if(canSim()){
-    if(S.drag){var b=S.drag.k.b,dx=S.drag.tx-b.position.x,dz=S.drag.tz-b.position.z,l=Math.hypot(dx,dz),sp=Math.min(l*10,6);
+    if(S.drag){var b=S.drag.k.b,dx=S.drag.tx-b.position.x,dz=S.drag.tz-b.position.z,l=Math.hypot(dx,dz),sp=Math.min(l*5,2.2);
       if(l>1e-4)b.velocity.set(dx/l*sp,0,dz/l*sp);else b.velocity.set(0,0,0);b.angularVelocity.set(0,0,0)}
     if(S.pl){var p=S.pl,w=p.wp[p.i],kb=p.k.b;
       if(p.t===0&&w.yaw!==undefined){var q=new CANNON.Quaternion();q.setFromAxisAngle(new CANNON.Vec3(0,1,0),w.yaw);kb.quaternion.copy(q)}
       p.t+=dt;var a=Math.min(p.t/w.d,1);
       kb.position.set(p.f.x+(w.x-p.f.x)*a,p.f.y+(w.y-p.f.y)*a,p.f.z+(w.z-p.f.z)*a);kb.velocity.set(0,0,0);kb.angularVelocity.set(0,0,0);
       if(a>=1){p.f={x:w.x,y:w.y,z:w.z};p.i++;p.t=0;if(p.i>=p.wp.length)donePlace()}}
-    S.w.step(1/60,dt,5);sync();
+    S.w.step(1/120,dt,10);sync();
     if(S.settle>0)S.settle--;
     else if(!S.over&&S.blocks.some(function(k){var p=k.b.position;return k!==S.picked&&(Math.hypot(p.x,p.z)>3.4||(k.layer>0&&p.y<.5))})){
       S.over=true;S.loser=O.uid;S.drag=null;
