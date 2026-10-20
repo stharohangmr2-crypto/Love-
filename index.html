@@ -162,20 +162,46 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 .up .un small{font-weight:400;color:var(--mu)}
 .up .uk{font-size:12px;color:var(--mu)}
 .up .uk.u1{color:var(--ac2);font-weight:700}
-.ut{display:flex;gap:16px;justify-content:center;align-items:center;margin:6px 0 10px}
-.uc{width:56px;height:80px;border-radius:10px;border:2px solid #fff;color:#fff;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.25)}
-.uc b{font-size:24px;font-weight:800;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.3)}
-.uc.big{width:84px;height:120px;border-radius:14px}
-.uc.big b{font-size:38px}
-.uc small{font-size:12px;opacity:.9;margin-top:5px}
-.uR{background:#e5484d}.uG{background:#30a46c}.uB{background:#3e63dd}.uY{background:#f5a524;color:#1d1b22}
-.uY b{text-shadow:none}
-.uW{background:conic-gradient(#e5484d 0 25%,#f5a524 0 50%,#30a46c 0 75%,#3e63dd 0)}
-.uback{background:#1d1b22;border-color:var(--ac2)}
-.uc.no{opacity:.4}
-.uc.ok{box-shadow:0 0 0 3px var(--ac),0 4px 10px rgba(0,0,0,.3);transform:translateY(-4px)}
-.uc:disabled{cursor:default}
-.uh{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px;padding:6px 0}
+.tbl{position:relative;margin:8px -4px 8px;padding:18px 8px 14px;border-radius:22px;background:radial-gradient(ellipse at 50% 35%,#238a57 0%,#16613f 55%,#0c3d27 100%);box-shadow:inset 0 0 0 5px #6b4524,inset 0 0 0 7px #8a5d33,inset 0 0 36px rgba(0,0,0,.5)}
+.ut{display:flex;gap:30px;justify-content:center;align-items:flex-start;margin:0}
+.uc{position:relative;width:62px;height:90px;border-radius:9px;border:3px solid #fff;color:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;flex:none;background:#999}
+.uc .ov{position:absolute;left:11%;right:11%;top:13%;bottom:13%;background:#fff;border-radius:50%;transform:rotate(-26deg);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.uc .ov b{transform:rotate(26deg);font-size:28px;font-weight:900;line-height:1;color:var(--cc,#222);text-shadow:1px 1px 0 rgba(0,0,0,.45);font-family:Georgia,"Times New Roman",serif}
+.uc .cn{position:absolute;font-style:normal;font-weight:800;font-size:12px;line-height:1;text-shadow:0 1px 1px rgba(0,0,0,.4)}
+.uc .tl{left:5px;top:4px}.uc .br{right:5px;bottom:4px;transform:rotate(180deg)}
+.uc.big{width:92px;height:134px;border-radius:13px;border-width:4px}
+.uc.big .cn{font-size:17px}.uc.big .tl{left:7px;top:6px}.uc.big .br{right:7px;bottom:6px}
+.uc.big .ov b{font-size:46px}
+.uR{background:#d8281a;--cc:#d8281a}.uG{background:#2f9a3e;--cc:#2f9a3e}.uB{background:#1457c4;--cc:#1457c4}.uY{background:#f2c500;--cc:#f2c500;color:#fff}
+.uW{background:#14131a}
+.uW .ov{background:conic-gradient(#d8281a 0 25%,#f2c500 0 50%,#2f9a3e 0 75%,#1457c4 0)}
+.uW .ov b{color:#fff}
+.uback{background:#14131a;border-color:#fff}
+.uback .ov{background:#d8281a}
+.uback .ov b{color:#ffd400;font-style:italic;font-size:15px;letter-spacing:-1px;text-shadow:1px 1px 0 #000}
+.uc.big.uback .ov b{font-size:25px}
+.dk{display:flex;flex-direction:column;align-items:center;gap:8px}
+.dk .uc.big{box-shadow:0 1px 0 #555,0 2px 0 #14131a,0 3px 0 #555,0 4px 0 #14131a,0 5px 0 #555,0 12px 14px rgba(0,0,0,.5)}
+.dk .uc.ok{cursor:pointer;animation:upulse 1.2s ease-in-out infinite}
+.dk .uc.no{filter:brightness(.7)}
+@keyframes upulse{0%,100%{box-shadow:0 1px 0 #555,0 2px 0 #14131a,0 3px 0 #555,0 4px 0 #14131a,0 5px 0 #555,0 0 0 3px #ffe27a,0 0 14px 4px rgba(255,226,122,.5)}50%{box-shadow:0 1px 0 #555,0 2px 0 #14131a,0 3px 0 #555,0 4px 0 #14131a,0 5px 0 #555,0 0 0 3px #ffe27a,0 0 22px 8px rgba(255,226,122,.8)}}
+.cnt{font-size:12px;color:#d7f2e2;font-weight:700}
+.pf{display:flex;flex-direction:column;align-items:center;gap:8px}
+.pile{position:relative;width:92px;height:134px;border-radius:14px;transition:box-shadow .15s,transform .15s}
+.pile .uc{position:absolute;left:0;top:0}
+.pile.hl{box-shadow:0 0 0 3px #fff,0 0 24px 8px rgba(255,255,255,.55);transform:scale(1.05)}
+.ucol{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#d7f2e2}
+.ucol i{width:14px;height:14px;border-radius:50%;border:2px solid #fff;display:block}
+.uh{position:relative;height:150px;margin:4px 0 0;overflow:visible}
+.uh .uc{position:absolute;left:50%;top:26px;margin-left:-31px;transform:translateX(var(--x,0px)) translateY(var(--y,0px)) rotate(var(--a,0deg));transition:transform .18s ease,filter .18s ease}
+.uh .uc.ok{cursor:grab;touch-action:none;transform:translateX(var(--x,0px)) translateY(calc(var(--y,0px) - 18px)) rotate(var(--a,0deg));box-shadow:0 0 0 2px #ffe27a,0 0 14px 4px rgba(255,226,122,.6)}
+.uh .uc.no{filter:brightness(.62)}
+.uc.ghost{position:fixed;margin:0;z-index:9999;pointer-events:none;transition:none;box-shadow:0 14px 26px rgba(0,0,0,.5),0 0 0 2px #ffe27a;will-change:transform}
+.uc.tmp{position:fixed;z-index:9998;pointer-events:none;margin:0}
+.mini{display:flex;justify-content:center;height:16px;margin:3px 0 1px}
+.mini i{display:block;width:11px;height:16px;border-radius:2px;background:#14131a;border:1.5px solid #fff;margin-left:-6px;box-shadow:0 1px 2px rgba(0,0,0,.3);position:relative}
+.mini i:first-child{margin-left:0}
+.mini i:after{content:"";position:absolute;left:2px;right:2px;top:3px;bottom:3px;border-radius:50%;background:#d8281a}
 .ust{text-align:center;font-size:14px;color:var(--mu);margin:0 0 4px;min-height:20px}
 .utn{text-align:center;font-size:18px;font-weight:800;margin:4px 0}
 .upick{display:flex;gap:8px;margin:10px 0}
@@ -680,17 +706,19 @@ function unoAct(a,v,r,host){
     unoSend(r,nu);
   }
 }
-function ucardH(c,extra,att){
-  return'<button class="uc '+(unoWild(c)?'uW':'u'+c[0])+(extra||'')+'" '+(att||'')+'><b>'+unoLbl(c)+'</b></button>';
+function ucardH(c,extra,st,big){
+  var l=unoLbl(c);
+  return'<div class="uc '+(unoWild(c)?'uW':'u'+c[0])+(big?' big':'')+(extra||'')+'" data-c="'+c+'"'+(st?' style="'+st+'"':'')+'><i class="cn tl">'+l+'</i><span class="ov"><b>'+l+'</b></span><i class="cn br">'+l+'</i></div>';
 }
 function vUno(r,us,isH){
-  var u=r.uno||{hands:{},deck:[],disc:["R0"]},me=O.uid,hand=(u.hands[me]||[]).slice().sort(),top=u.disc[u.disc.length-1];
+  var u=r.uno||{hands:{},deck:[],disc:["R0"]},me=O.uid,top=u.disc[u.disc.length-1];
+  var hand=(u.hands[me]||[]).slice().sort();
   var over=r.phase==="unoend",myT=!over&&u.turn===me,nm=function(x){return r.players[x]?r.players[x].name:"?"};
   var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
   var h='<div class="panel"><div class="rh"><span>'+esc(O.code)+'</span><span>UNO</span>'+(over?'':'<span>'+(u.dir===1?'↻ clockwise':'↺ counter-clockwise')+'</span>')+'</div>';
   h+='<div class="ur">'+us.map(function(x){
     var c=(u.hands[x]||[]).length;
-    return'<div class="up'+(!over&&x===u.turn?' now':'')+'">'+av(nm(x))+'<div class="un">'+esc(nm(x))+(x===me?' <small>you</small>':'')+(x===r.host?' 👑':'')+'</div><div class="uk'+(c===1?' u1':'')+'">'+(c===1?'UNO! 1 card':c+' cards')+'</div></div>';
+    return'<div class="up'+(!over&&x===u.turn?' now':'')+'">'+av(nm(x))+'<div class="un">'+esc(nm(x))+(x===me?' <small>you</small>':'')+(x===r.host?' 👑':'')+'</div>'+(x===me?'':'<div class="mini">'+new Array(Math.min(c,9)+1).join('<i></i>')+'</div>')+'<div class="uk'+(c===1?' u1':'')+'">'+(c===1?'UNO! 1 card':c+' cards')+'</div></div>';
   }).join("")+'</div>';
   if(over){
     var win=u.win===me;
@@ -699,22 +727,122 @@ function vUno(r,us,isH){
     return h+leave;
   }
   var canDraw=myT&&!u.drew;
-  h+='<div class="ut"><button class="uc big uback'+(canDraw?' ok':' no')+'" '+(canDraw?'data-a="uno_draw"':'disabled')+'><b>UNO</b><small>'+(myT&&u.pend>0?'draw '+u.pend:u.deck.length+' left')+'</small></button>'+
-    '<div class="uc big u'+u.col+'"><b>'+unoLbl(top)+'</b><small>'+UCOL[u.col]+'</small></div></div>';
-  h+=(u.pend>0?'<p class="ust" style="color:var(--ac2);font-weight:700">+'+u.pend+' pending. '+(myT?'Stack a '+(top==='F'?'+4':'+2')+' or tap the deck to draw '+u.pend:'Stacking is on')+'</p>':'')+'<div class="utn">'+(myT?'Your turn':esc(nm(u.turn))+'’s turn')+'</div><p class="ust">'+esc(u.last||"")+'</p>';
-  if(O.uw&&myT&&hand.indexOf(O.uw)>=0){
+  var pile=u.disc.slice(-5).map(function(c,j,arr){
+    var k=u.disc.length-arr.length+j,last=j===arr.length-1;
+    var rot=last?((k*7)%9)-4:((k*53)%46)-23,x=last?0:((k*29)%15)-7,y=last?0:((k*17)%13)-6;
+    return ucardH(c,'',"transform:translate("+x+"px,"+y+"px) rotate("+rot+"deg)",true);
+  }).join("");
+  h+='<div class="tbl"><div class="ut"><div class="dk"><div class="uc big uback'+(canDraw?' ok':' no')+'" '+(canDraw?'data-a="uno_draw"':'')+'><span class="ov"><b>UNO</b></span></div><span class="cnt">'+(myT&&u.pend>0?'tap: draw '+u.pend:u.deck.length+' cards')+'</span></div>'+
+    '<div class="pf"><div class="pile" id="upile">'+pile+'</div><div class="ucol"><i class="u'+u.col+'"></i>'+UCOL[u.col]+'</div></div></div></div>';
+  h+=(u.pend>0?'<p class="ust" style="color:var(--ac2);font-weight:700">+'+u.pend+' pending. '+(myT?'Throw a '+(top==='F'?'+4':'+2')+' or tap the deck to draw '+u.pend:'Stacking is on')+'</p>':'')+'<div class="utn">'+(myT?'Your turn':esc(nm(u.turn))+'’s turn')+'</div><p class="ust">'+esc(u.last||"")+'</p>';
+  var pick=O.uw&&myT&&hand.indexOf(O.uw)>=0;
+  if(pick){
     h+='<div class="kl" style="text-align:center">Pick a color</div><div class="upick">'+["R","Y","G","B"].map(function(c){return'<button class="u'+c+'" data-a="uno_wild" data-v="'+c+'">'+UCOL[c]+'</button>'}).join("")+'</div><button class="btn alt" data-a="uno_cancel" style="margin-top:0">Cancel</button>';
   }else if(myT&&u.drew){
-    h+='<p class="sub" style="text-align:center;margin:0">You can play the card you drew, or keep it and pass.</p><button class="btn alt" data-a="uno_pass" style="margin-top:8px">Keep it and pass</button>';
+    h+='<p class="sub" style="text-align:center;margin:0">You can throw the card you drew, or keep it and pass.</p><button class="btn alt" data-a="uno_pass" style="margin:8px 0">Keep it and pass</button>';
   }
-  h+='<div class="uh">'+hand.map(function(c){
+  var shown=hand.slice();
+  if(pick){var wi=shown.indexOf(O.uw);if(wi>=0)shown.splice(wi,1)}
+  var n=shown.length,avail=Math.max(200,Math.min(($("ovMain")&&$("ovMain").clientWidth)||360,520)-50);
+  var step=n>1?Math.min(46,(avail-62)/(n-1)):0,maxA=Math.min(15,3.2*n),half=Math.max((n-1)/2,.5);
+  h+='<div class="uh" id="uhand">'+shown.map(function(c,i){
+    var off=i-(n-1)/2,rel=off/half;
     var ok=myT&&unoOk(c,top,u.col,u.pend)&&(!u.drew||u.drew===c);
-    return ucardH(c,ok?' ok':' no',ok?'data-a="uno_play" data-v="'+c+'"':'disabled');
+    return ucardH(c,ok?' ok':' no',"--x:"+(off*step).toFixed(1)+"px;--y:"+(rel*rel*16).toFixed(1)+"px;--a:"+(rel*maxA).toFixed(1)+"deg;z-index:"+(i+1));
   }).join("")+'</div>';
-  h+='<p class="sub" style="margin:8px 0 0;font-size:12.5px;text-align:center">Match the color or the number. Wild cards can be played any time. Stacking: answer +2 with +2 and +4 with +4, or draw the total. Stuck? Draw a card. UNO is called for you.</p>';
+  h+='<p class="sub" style="margin:2px 0 0;font-size:12.5px;text-align:center">'+(myT?'Drag a glowing card onto the pile and let go to throw it.':'Wait for your turn.')+' Stack +2 on +2 and +4 on +4, or draw the total. UNO is called for you.</p>';
   if(isH&&!myT)h+='<button class="btn alt" data-a="uno_skip">Skip '+esc(nm(u.turn))+'’s turn</button>';
   return h+leave;
 }
+/* ---------- UNO animations ---------- */
+function uctr(el){var b=el.getBoundingClientRect();return{x:b.left+b.width/2,y:b.top+b.height/2,w:b.width,h:b.height,l:b.left,t:b.top}}
+function uchip(us,x){var l=$("ovMain").querySelectorAll(".up");return l[us.indexOf(x)]||null}
+function uFrom(el,from,delay,dur,sc,rot){
+  if(!el||!from||!el.animate)return;
+  var a=uctr(from),b=uctr(el);
+  try{el.animate([{transform:"translate("+(a.x-b.x)+"px,"+(a.y-b.y)+"px) scale("+(sc||.6)+") rotate("+(rot||-25)+"deg)",opacity:.0,offset:0},{opacity:1,offset:.15}].concat([]),{delay:delay||0,duration:dur||420,easing:"cubic-bezier(.2,.8,.3,1)",fill:"backwards"})}catch(e){}
+}
+function uBack(from,to,delay,dur){
+  if(!from||!to||!from.animate)return;
+  var a=uctr(from),b=uctr(to),d=document.createElement("div");
+  d.className="uc uback tmp";d.innerHTML='<span class="ov"><b>UNO</b></span>';
+  d.style.cssText="left:"+(a.x-31)+"px;top:"+(a.y-45)+"px";
+  d.style.opacity="0";document.body.appendChild(d);
+  var an=d.animate([{transform:"translate(0,0) scale(1) rotate(0deg)",opacity:1,offset:0},{transform:"translate("+(b.x-a.x)+"px,"+(b.y-a.y)+"px) scale(.35) rotate(25deg)",opacity:.9,offset:1}],{delay:delay||0,duration:dur||380,easing:"cubic-bezier(.3,.7,.3,1)",fill:"both"});
+  an.onfinish=function(){d.remove()};
+}
+function uShuffle(deck){
+  if(!deck||!deck.animate)return 0;
+  var r=uctr(deck),N=14,D=350+N*55+260,tmp=[];
+  deck.style.visibility="hidden";
+  for(var i=0;i<N;i++){
+    var d=document.createElement("div"),side=i%2?1:-1;
+    d.className="uc big uback tmp";d.innerHTML='<span class="ov"><b>UNO</b></span>';
+    d.style.cssText="left:"+(r.x-46)+"px;top:"+(r.y-67)+"px;z-index:"+(9000+i);
+    document.body.appendChild(d);tmp.push(d);
+    var t1=350/D,t2=(350+i*55)/D,t3=(350+i*55+260)/D;
+    var sx=side*(64+(i%3)*4),sr=side*(10+(i%3)*2);
+    d.animate([
+      {transform:"translate(0,0) rotate(0deg)",offset:0},
+      {transform:"translate("+sx+"px,-10px) rotate("+sr+"deg)",offset:t1},
+      {transform:"translate("+sx+"px,-10px) rotate("+sr+"deg)",offset:t2},
+      {transform:"translate("+side*6+"px,"+(-i*.6)+"px) rotate("+(-side*3)+"deg)",offset:Math.min(t3,.98)},
+      {transform:"translate(0,0) rotate(0deg)",offset:1}
+    ],{duration:D,fill:"both",easing:"ease-in-out"});
+  }
+  setTimeout(function(){tmp.forEach(function(x){x.remove()});deck.style.visibility=""},D+30);
+  return D;
+}
+function unoDeal(u,us){
+  var ov=$("ovMain"),deck=ov.querySelector(".dk .uc"),n=us.length,my=us.indexOf(O.uid),step=85;
+  if(!deck)return;
+  var base=uShuffle(deck)+150,total=base+n*7*step+500;
+  O.udeal=Date.now()+total;
+  [].slice.call(ov.querySelectorAll(".uh .uc")).forEach(function(el,k){uFrom(el,deck,base+(k*n+Math.max(my,0))*step,430,.5,-30)});
+  us.forEach(function(x,i){
+    if(x===O.uid)return;var ch=uchip(us,x);if(!ch)return;
+    for(var k=0;k<7;k++)uBack(deck,ch,base+(k*n+i)*step,380);
+  });
+  var top=ov.querySelector(".pile .uc:last-child");
+  if(top&&top.animate)try{top.animate([{transform:"translate(0,-40px) rotateY(90deg) scale(1.1)",opacity:0,offset:0},{opacity:1,offset:.3}],{delay:base+n*7*step,duration:520,easing:"ease-out",fill:"backwards"})}catch(e){}
+}
+function unoFx(r){
+  var u=r.uno,me=O.uid;
+  if(!u){O.ufx=null;return}
+  var us=order(r),P=O.ufx,mine=(u.hands[me]||[]).slice().sort(),cnt={};
+  us.forEach(function(x){cnt[x]=(u.hands[x]||[]).length});
+  var S={disc:u.disc.length,deck:u.deck.length,cnt:cnt,turn:u.turn,mine:mine};
+  O.ufx=r.phase==="unoend"?null:S;
+  var ov=$("ovMain"),deck=ov.querySelector(".dk .uc");
+  if(!P){
+    if(S.disc===1&&us.every(function(x){return cnt[x]===7}))unoDeal(u,us);
+    return;
+  }
+  if(S.deck>P.deck&&S.disc<P.disc)uShuffle(deck);
+  if(S.disc>P.disc){
+    var top=ov.querySelector(".pile .uc:last-child"),mover=P.turn;
+    if(top&&!(mover===me&&O.fly)){
+      var from=mover===me?ov.querySelector(".uh"):uchip(us,mover);
+      uFrom(top,from,0,420,.4,-40);
+    }
+  }
+  us.forEach(function(x){
+    var g=cnt[x]-(P.cnt[x]||0);
+    if(g<=0)return;
+    if(x===me){
+      var have={};P.mine.forEach(function(c){have[c]=(have[c]||0)+1});
+      var k=0;
+      [].slice.call(ov.querySelectorAll(".uh .uc")).forEach(function(el){
+        var c=el.getAttribute("data-c");
+        if(have[c]>0){have[c]--;return}
+        uFrom(el,deck,k*140,450,.5,-30);k++;
+      });
+    }else{
+      var ch=uchip(us,x);for(var i=0;i<Math.min(g,6);i++)uBack(deck,ch,i*130,380);
+    }
+  });
+}
+function uclearFly(){if(O.fly&&!O.uw){try{O.fly.remove()}catch(e){}O.fly=null}}
 function vRoom(){
   var r=O.room;if(!r)return'<div class="panel">Joining…</div>';
   if(!r.players||!r.players[O.uid])return'<div class="panel">You’re not in this room.<button class="btn alt" data-a="leave">Back</button></div>';
@@ -774,6 +902,8 @@ function draw(){
   var h=O.view==="home"?vHome():O.view==="list"?vList():vRoom();
   $("ovMain").innerHTML=(O.msg?'<div class="err" style="margin:0 0 10px">'+esc(O.msg)+'</div>':"")+h;
   var r=O.room,me=r&&r.players&&r.players[O.uid];
+  if(O.view==="room"&&r&&(r.phase==="uno"||r.phase==="unoend")){try{unoFx(r)}catch(e){}}else O.ufx=null;
+  uclearFly();
   $("ovChat").classList.toggle("hide",!(O.view==="room"&&r&&["chat","vote","over"].indexOf(r.phase)>=0));
   $("ci").placeholder=me&&me.alive===false?"Spectators can’t chat":r&&r.mode==="emoji"?"Up to 3 emojis":r&&r.mode==="last"?"One word":"Say something…";
   updDraw();
@@ -796,7 +926,7 @@ function poll(){
       if(P.host&&(r.phase!==O.ap||(r.phase==="lobby"&&Date.now()-O.an>15000))){O.ap=r.phase;O.an=Date.now();announce()}
       showChat(chat);
       var s=JSON.stringify(r);
-      if(!O.pk&&s!==O.sig){O.sig=s;O.room=r;if(r.phase!==O.ph){O.ph=r.phase;if(r.phase==="reveal"||r.phase==="lobby")O.show=false}draw()}
+      if(!O.pk&&!O.dg&&s!==O.sig){O.sig=s;O.room=r;if(r.phase!==O.ph){O.ph=r.phase;if(r.phase==="reveal"||r.phase==="lobby")O.show=false}draw()}
     }).catch(function(){O.busy=0});
   }
 }
@@ -1034,6 +1164,63 @@ function commitStroke(r,p){
 })();
 $("cs").onclick=send;
 $("ci").onkeydown=function(e){if(e.key==="Enter")send()};
+(function(){
+  var G=null;
+  function pileRect(){var p=$("upile");return p?p.getBoundingClientRect():null}
+  function over(x,y,pad){var b=pileRect();return !!b&&x>b.left-pad&&x<b.right+pad&&y>b.top-pad&&y<b.bottom+pad}
+  function end(ev){
+    if(!G)return;
+    var g=G;G=null;
+    window.removeEventListener("pointermove",mv);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);
+    var p=$("upile");if(p)p.classList.remove("hl");
+    var dx=ev.clientX-g.sx,dy=ev.clientY-g.sy;
+    var thrown=over(ev.clientX,ev.clientY,40)||(g.vy<-.7&&dy<-60&&ev.type!=="pointercancel");
+    var b=pileRect();
+    if(thrown&&b&&ev.type!=="pointercancel"){
+      var tx=b.left+b.width/2-(g.rc.left+g.rc.width/2),ty=b.top+b.height/2-(g.rc.top+g.rc.height/2);
+      g.g.style.transition="transform .2s cubic-bezier(.2,.8,.3,1)";
+      g.g.style.transform="translate("+tx+"px,"+ty+"px) rotate("+((Math.random()*10-5).toFixed(1))+"deg) scale(1.48)";
+      O.fly=g.g;
+      setTimeout(function(){
+        O.dg=false;
+        act("uno_play",g.c);
+        setTimeout(function(){if(O.fly===g.g)uclearFly()},1600);
+      },210);
+    }else{
+      g.g.style.transition="transform .22s cubic-bezier(.2,.8,.3,1)";
+      g.g.style.transform="translate(0,0) rotate(0deg) scale(1)";
+      setTimeout(function(){g.g.remove();if(g.el)g.el.style.visibility="";O.dg=false},230);
+    }
+  }
+  function mv(e){
+    if(!G||e.pointerId!==G.id)return;
+    var dx=e.clientX-G.sx,dy=e.clientY-G.sy,t=Date.now(),dt=Math.max(1,t-G.lt);
+    G.vy=.6*G.vy+.4*((e.clientY-G.ly)/dt);G.vx=.6*G.vx+.4*((e.clientX-G.lx)/dt);
+    G.lx=e.clientX;G.ly=e.clientY;G.lt=t;
+    var tilt=Math.max(-18,Math.min(18,G.vx*14));
+    G.g.style.transform="translate("+dx+"px,"+dy+"px) rotate("+tilt+"deg) scale(1.15)";
+    var p=$("upile");if(p)p.classList.toggle("hl",over(e.clientX,e.clientY,40));
+    e.preventDefault();
+  }
+  $("ovMain").addEventListener("pointerdown",function(e){
+    var el=e.target.closest&&e.target.closest(".uh .uc.ok");
+    if(!el||G||Date.now()<(O.udeal||0)||(e.button&&e.button!==0))return;
+    var r=O.room;if(!r||r.phase!=="uno"||!el.getAttribute("data-c"))return;
+    e.preventDefault();
+    var rc=el.getBoundingClientRect(),g=el.cloneNode(true);
+    g.className=el.className.replace(/\b(ok|no)\b/g,"").trim()+" ghost";
+    g.removeAttribute("style");
+    g.style.left=rc.left+"px";g.style.top=rc.top+"px";g.style.width=rc.width+"px";g.style.height=rc.height+"px";
+    g.style.transform="scale(1.15)";
+    document.body.appendChild(g);
+    el.style.visibility="hidden";
+    O.dg=true;
+    G={el:el,g:g,id:e.pointerId,sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,lt:Date.now(),vx:0,vy:0,rc:rc,c:el.getAttribute("data-c")};
+    window.addEventListener("pointermove",mv,{passive:false});
+    window.addEventListener("pointerup",end);
+    window.addEventListener("pointercancel",end);
+  });
+})();
 $("goOnline").onclick=function(){O.view="home";O.sig="";show("online");draw()};
 
 $("ovMain").addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest("[data-hold]"))holdNotes(true)});
