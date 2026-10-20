@@ -2006,15 +2006,17 @@ $("ovMain").addEventListener("click",function(e){var t=e.target.closest&&e.targe
 var jengaSync,jengaHide,vJenga,jengaAct,jStart,jRecv;
 (function(){
 var JL=3,JW=1,JH=.6,JN=18;
-var S={id:0,turn:0,over:false,loser:null,order:[],blocks:[],picked:null,drag:null,pl:null,settle:0,calm:0,wt:0,wait:false,ok:false,vis:false,raf:0,last:0,az:.7,el:.75,dist:15,ty:5.4,ptr:{},orb:false,pd:0};
+var S={id:0,turn:0,over:false,loser:null,order:[],blocks:[],picked:null,drag:null,mini:null,cand:null,pl:null,settle:0,calm:0,wt:0,wait:false,ok:false,vis:false,raf:0,last:0,az:.7,el:.75,dist:15,ty:5.4,ptr:{},orb:false,pd:0};
 var $j=function(i){return document.getElementById(i)},clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
 var st=document.createElement("style");
-st.textContent="#jg{position:fixed;inset:0;z-index:60;background:radial-gradient(circle at 50% 40%,var(--sf),var(--bg));touch-action:none}#jg canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}#jh{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 8px);text-align:center;pointer-events:none;padding:0 12px}#jst{display:inline-block;background:var(--sf);border:1px solid var(--bd);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700}#jt{margin-top:8px;font-size:13px;color:var(--ac);font-weight:700;min-height:18px}#jb{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:8px;justify-content:center;padding:0 12px}#jb button{padding:12px 16px;border-radius:14px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-weight:600}#jend{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45)}#jend .panel{max-width:360px;width:100%;text-align:center}#jend h2{margin:0 0 6px}";
+st.textContent="#jg{position:fixed;inset:0;z-index:60;background:radial-gradient(circle at 50% 40%,var(--sf),var(--bg));touch-action:none}#jg canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}#jh{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 8px);text-align:center;pointer-events:none;padding:0 12px}#jst{display:inline-block;background:var(--sf);border:1px solid var(--bd);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700}#jt{margin-top:8px;font-size:13px;color:var(--ac);font-weight:700;min-height:18px}#jb{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:8px;justify-content:center;padding:0 12px}#jb button{padding:12px 16px;border-radius:14px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-weight:600}#jend{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45)}#jend .panel{max-width:360px;width:100%;text-align:center}#jend h2{margin:0 0 6px}#jm{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 72px);display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px}#jml{font-size:13px;font-weight:700;background:var(--sf);border:1px solid var(--bd);border-radius:99px;padding:4px 12px}#jtr{position:relative;width:min(88vw,420px);height:34px;border-radius:12px;background:var(--sf);border:2px solid var(--bd);overflow:hidden}#jzn{position:absolute;top:0;bottom:0;background:#2fbf8a}#jmk{position:absolute;top:0;bottom:0;width:6px;margin-left:-3px;background:var(--tx)}#jhit{width:min(88vw,420px);padding:14px;border-radius:14px;border:0;background:var(--ac);color:#fff;font:inherit;font-weight:800;font-size:18px}";
 document.head.appendChild(st);
 var jg=document.createElement("div");jg.id="jg";jg.className="hide";
-jg.innerHTML='<canvas id="jc"></canvas><div id="jh"><span id="jst"></span><div id="jt"></div></div><div id="jb"><button id="jzo">−</button><button id="jzi">＋</button><button id="jlv">Leave</button></div><div id="jend" class="hide"><div class="panel"><h2 id="jet"></h2><p class="sub" id="jes"></p><div id="jeb"></div></div></div>';
+jg.innerHTML='<canvas id="jc"></canvas><div id="jh"><span id="jst"></span><div id="jt"></div></div><div id="jm" class="hide"><div id="jml"></div><div id="jtr"><i id="jzn"></i><b id="jmk"></b></div><button id="jhit">HIT</button></div><div id="jb"><button id="jzo">−</button><button id="jzi">＋</button><button id="jlv">Leave</button></div><div id="jend" class="hide"><div class="panel"><h2 id="jet"></h2><p class="sub" id="jes"></p><div id="jeb"></div></div></div>';
 document.body.appendChild(jg);
 $j("jlv").onclick=function(){act("leave")};
+$j("jhit").onpointerdown=function(e){e.preventDefault();hit()};
+document.addEventListener("keydown",function(e){if((e.code==="Space"||e.key==="Enter")&&S.vis&&S.mini&&!S.mini.done){e.preventDefault();hit()}});
 $j("jzi").onclick=function(){S.dist=clamp(S.dist*.88,7,40)};
 $j("jzo").onclick=function(){S.dist=clamp(S.dist*1.14,7,40)};
 $j("jeb").onclick=function(e){var t=e.target.closest("[data-j]");if(t)act(t.getAttribute("data-j"))};
@@ -2086,26 +2088,50 @@ function plan(k,L0,u){
   S.pl={k:k,wp:wp,i:0,t:0,f:{x:p.x,y:p.y,z:p.z}};
 }
 function donePlace(){var k=S.pl.k;S.pl=null;S.picked=null;dyn(k);k.placed=true;S.wait=true;S.calm=0;S.wt=0}
+function zone(){var m=S.mini,w=[.30,.24,.18,.13][m.step],c=.15+Math.random()*.7;m.z=[Math.max(0,c-w/2),Math.min(1,c+w/2)];m.sp=[.9,1.3,1.75,2.3][m.step];m.p=0;m.d=1;
+  $j("jzn").style.left=m.z[0]*100+"%";$j("jzn").style.width=(m.z[1]-m.z[0])*100+"%";$j("jml").textContent="Hit the green · "+(m.step+1)+" of 4"}
+function startMini(k){
+  var L=lng(k),cp=S.cam.position,dir=(cp.x*L.x+cp.z*L.z)>=0?1:-1,p=k.b.position;
+  kin(k);S.picked=k;S.drag={k:k,L:L,sx:p.x,sz:p.z,tx:p.x,tz:p.z};
+  S.mini={k:k,L:L,dir:dir,step:0,done:false};zone();$j("jm").classList.remove("hide");
+}
+function jolt(k){S.blocks.forEach(function(b){if(b!==k&&Math.abs(b.b.position.y-k.b.position.y)<1.6){b.b.wakeUp();b.b.velocity.x+=(Math.random()-.5)*.5;b.b.velocity.z+=(Math.random()-.5)*.5}})}
+function hit(){
+  var m=S.mini;if(!m||m.done||!canPlay())return;
+  if(m.p>=m.z[0]&&m.p<=m.z[1]){
+    m.step++;S.drag.tx=S.drag.sx+m.L.x*m.dir*.8*m.step;S.drag.tz=S.drag.sz+m.L.z*m.dir*.8*m.step;
+    if(m.step>=4){m.done=true;$j("jm").classList.add("hide");toast("It’s out! Tap anywhere to place it on top")}
+    else{toast("Nice! The next one is harder");zone()}
+  }else{jolt(m.k);toast("Missed! The tower shakes");zone()}
+}
+function placeIt(){
+  var m=S.mini;if(!m||!m.done||S.pl)return;S.mini=null;var k=m.k,p=k.b.position;S.drag=null;plan(k,m.L,p.x*m.L.x+p.z*m.L.z);
+}
 function bind(){
   var cv=$j("jc");
   cv.addEventListener("pointerdown",function(e){
-    cv.setPointerCapture(e.pointerId);S.ptr[e.pointerId]=[e.clientX,e.clientY];
-    if(Object.keys(S.ptr).length>1){if(S.drag)release();S.orb=true;S.pd=pdist();return}
+    cv.setPointerCapture(e.pointerId);S.ptr[e.pointerId]=[e.clientX,e.clientY];S.cand=null;S.mv=0;
+    if(Object.keys(S.ptr).length>1){S.orb=true;S.pd=pdist();S.mv=99;return}
     setRay(e);
-    if(canPlay()&&!S.pl&&!S.wait){
+    if(canPlay()&&!S.pl&&!S.wait&&!S.mini){
       var h=S.ray.intersectObjects(S.blocks.map(function(k){return k.m}));
       if(h.length){var k=S.blocks.filter(function(q){return q.m===h[0].object})[0];
-        if(k&&!k.placed&&(k===S.picked||k.b.position.y<topY(S.picked)-.7)){grab(k,h[0].point);return}
-        if(k)toast("Take a block from lower down, not the top two layers")}}
+        if(k&&!k.placed){if(k.b.position.y<topY(null)-.7)S.cand=k;else toast("Pick a block from lower down, not the top two layers")}}}
     S.orb=true;
   });
   cv.addEventListener("pointermove",function(e){
-    var o=S.ptr[e.pointerId];if(!o)return;var dx=e.clientX-o[0],dy=e.clientY-o[1];S.ptr[e.pointerId]=[e.clientX,e.clientY];
+    var o=S.ptr[e.pointerId];if(!o)return;var dx=e.clientX-o[0],dy=e.clientY-o[1];S.ptr[e.pointerId]=[e.clientX,e.clientY];S.mv+=Math.abs(dx)+Math.abs(dy);
     if(Object.keys(S.ptr).length>1){var d=pdist();S.dist=clamp(S.dist*S.pd/d,7,40);S.pd=d;return}
-    if(S.drag){setRay(e);if(S.ray.ray.intersectPlane(S.drag.pl,S.tmp)){var D=S.drag,s=clamp((S.tmp.x-D.hx)*D.L.x+(S.tmp.z-D.hz)*D.L.z,-5.5,5.5);D.tx=D.sx+D.L.x*s;D.tz=D.sz+D.L.z*s}}
-    else if(S.orb){S.az-=dx*.008;S.el=clamp(S.el+dy*.006,.1,1.45)}
+    if(S.orb){S.az-=dx*.008;S.el=clamp(S.el+dy*.006,.1,1.45)}
   });
-  var up=function(e){delete S.ptr[e.pointerId];if(!Object.keys(S.ptr).length){release();S.orb=false}};
+  var up=function(e){
+    var last=Object.keys(S.ptr).length===1;delete S.ptr[e.pointerId];
+    if(last&&S.mv<10&&e.type==="pointerup"){
+      if(S.mini&&S.mini.done)placeIt();
+      else if(S.cand&&canPlay()&&!S.mini&&!S.pl&&!S.wait)startMini(S.cand);
+    }
+    if(!Object.keys(S.ptr).length){S.orb=false;S.cand=null}
+  };
   cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
   cv.addEventListener("wheel",function(e){e.preventDefault();S.dist=clamp(S.dist*(1+Math.sign(e.deltaY)*.08),7,40)},{passive:false});
 }
@@ -2115,8 +2141,9 @@ function endTurn(){
   S.wait=false;S.blocks.forEach(function(k){k.placed=false});S.turn++;
   wr(patch(rp(),{"jenga/turn":S.turn,"jenga/snap":pack()}));newTurn();
 }
-function newTurn(){S.settle=25;S.picked=null;S.drag=null;S.pl=null;S.wait=false;status();if(canPlay())toast("Your turn. Slide a block out along its length, then let go")}
+function newTurn(){S.mini=null;$j("jm").classList.add("hide");S.settle=25;S.picked=null;S.drag=null;S.pl=null;S.wait=false;status();if(canPlay())toast("Your turn. Tap a block to start pulling it out")}
 function status(){
+  if(S.over)$j("jm").classList.add("hide");
   $j("jst").textContent=S.over?"Game over":(canPlay()?"Your turn":nm(active())+" is playing");
 }
 function showEnd(r){
@@ -2128,6 +2155,7 @@ function showEnd(r){
 function loop(t){
   if(!S.vis){S.raf=0;return}
   S.raf=requestAnimationFrame(loop);var dt=Math.min((t-S.last)/1000||.016,.05);S.last=t;
+  if(S.mini&&!S.mini.done&&canPlay()){var m=S.mini;m.p+=m.d*m.sp*dt;if(m.p>=1){m.p=1;m.d=-1}else if(m.p<=0){m.p=0;m.d=1}$j("jmk").style.left=m.p*100+"%"}
   if(canSim()){
     if(S.drag){var b=S.drag.k.b,dx=S.drag.tx-b.position.x,dz=S.drag.tz-b.position.z,l=Math.hypot(dx,dz),sp=Math.min(l*5,2.2);
       if(l>1e-4)b.velocity.set(dx/l*sp,0,dz/l*sp);else b.velocity.set(0,0,0);b.angularVelocity.set(0,0,0)}
@@ -2168,7 +2196,7 @@ jengaSync=function(r){
   if(g.loser&&!S.over){S.over=true;S.loser=g.loser;if(okD(g.snap)&&!canSim())setT(g.snap);status();showEnd(r)}
   status();
 };
-jengaHide=function(){if(!S.vis)return;S.vis=false;jg.classList.add("hide");$j("jend").classList.add("hide");S.id=0};
+jengaHide=function(){if(!S.vis)return;$j("jm").classList.add("hide");S.mini=null;S.vis=false;jg.classList.add("hide");$j("jend").classList.add("hide");S.id=0};
 vJenga=function(r,us,isH){
   return'<div class="panel">'+(typeof THREE==="undefined"||typeof CANNON==="undefined"?'The 3D engine didn’t load. Allow cdnjs.cloudflare.com and reload.':'Loading the tower…')+'<button class="btn alt" data-a="leave">Leave room</button></div>';
 };
