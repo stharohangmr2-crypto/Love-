@@ -228,6 +228,8 @@ button.code{display:block;margin:6px auto 4px;background:none;border:0;color:var
 .upick button.uY{color:#1d1b22}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 </head>
 <body>
 <main>
@@ -308,7 +310,8 @@ var MODES=[
 {id:"emoji",n:"Emoji Only",d:"Describe the word with up to 3 emojis. The imposter only sees the category",o:1},
 {id:"last",n:"Last Letter",d:"Imposter knows only the first letter. One word each, and the imposter can guess",o:1},
 {id:"uno",n:"UNO",d:"Classic UNO. 2 to 6 players, online only",o:1},
-{id:"golf",n:"Golf",d:"3D-style golf, 5 holes. 2 to 6 players, online only. Drag back and release to swing",o:1}];
+{id:"golf",n:"Golf",d:"3D-style golf, 5 holes. 2 to 6 players, online only. Drag back and release to swing",o:1},
+{id:"jenga",n:"Jenga",d:"3D tower with real physics. 2 to 6 players, online only. Slide a block out, it drops on top, don’t topple the tower",o:1}];
 var CATS={"Pizza":"Food","Elephant":"Animal","Guitar":"Instrument","Hospital":"Place","Football":"Sport","Airplane":"Transport","Library":"Place","Ocean":"Nature","Birthday":"Event","Doctor":"Job","Volcano":"Nature","Cinema":"Place","Bicycle":"Transport","Snowman":"Winter","Pirate":"Character","Chess":"Game","Coffee":"Drink","Rainbow":"Nature","Astronaut":"Job","Castle":"Place","Ninja":"Character","Sushi":"Food","Camera":"Object","Desert":"Nature","Robot":"Machine","Dragon":"Creature","Lighthouse":"Building","Piano":"Instrument","Tiger":"Animal","Rocket":"Transport","Mountain":"Nature","Samurai":"Character","Fireworks":"Event","School":"Place","Wedding":"Event"};
 var RULES={classic:"Describe the word in one sentence each, then vote out the imposter.",blind:"Describe the word in one sentence each. The imposter is totally blind, so listen closely.",double:"Describe the word in one sentence each. Two of you are faking it.",under:"Describe your word in one sentence each. Someone has a different word and doesn’t know it.",quest:"Say your answer out loud, one by one. Someone answered a different question.",chaos:"Describe the word in one sentence each. There might be no imposter at all.",age:"Everyone knows who the age holder is. Ask them questions, then each player guesses their age.",draw:"Take turns adding strokes to the shared drawing, then discuss and vote. Someone doesn’t know the word and is faking it.",emoji:"Chat with up to 3 emojis only. Someone only knows the category, so watch for vague ones.",last:"Say one word that goes with the secret word. The imposter only knows its first letter and gets one guess."};
 var rohanI=-1,N=4,mode="classic",players=[],imps=[],pick=null,idx=0,shown=false,ch={};
@@ -562,7 +565,7 @@ function rq(m,p,b){
 var get=function(p){return rq("GET",p)},put=function(p,b){return rq("PUT",p,b)},patch=function(p,b){return rq("PATCH",p,b)},del=function(p){return rq("DELETE",p)},push=function(p,b){return rq("POST",p,b)};
 var OM=MODES.filter(function(m){return m.id!=="age"});
 var ONL={draw:1,emoji:1,last:1},LAPS=2;
-var minP=function(m){return m==="uno"||m==="golf"?2:3};
+var minP=function(m){return m==="uno"||m==="golf"||m==="jenga"?2:3};
 var modeDesc=function(id){var m=MODES.filter(function(o){return o.id===id})[0];return m?m.d:""};
 var EMO={"Pizza":"🍕🧀","Elephant":"🐘🌍","Guitar":"🎸🎶","Hospital":"🏥🚑","Football":"⚽🏟️","Airplane":"✈️☁️","Library":"📚🤫","Ocean":"🌊🧂","Birthday":"🎂🕯️🎉","Doctor":"🩺👨‍⚕️","Volcano":"🌋🔥","Cinema":"🎬🍿","Bicycle":"🚲🦵","Snowman":"⛄🥕","Pirate":"🏴‍☠️💰","Chess":"♟️👑","Coffee":"☕🌅","Rainbow":"🌈☔","Astronaut":"🧑‍🚀🌌","Castle":"🏰🐊","Ninja":"🥷🌑","Sushi":"🍣🍚","Camera":"📷🔍","Desert":"🏜️🌵","Robot":"🤖⚙️","Dragon":"🐉🔥","Lighthouse":"💡🌊🚢","Piano":"🎹🎼","Tiger":"🐯🌴","Rocket":"🚀🔥","Mountain":"⛰️❄️","Samurai":"⚔️🏯","Fireworks":"🎆🌃","School":"🏫🔔","Wedding":"💍👰"};
 var CATEM={"Food":"🍽️","Animal":"🐾","Instrument":"🎵","Place":"📍","Sport":"🏅","Transport":"🚦","Nature":"🌿","Event":"🎉","Job":"💼","Winter":"❄️","Character":"🎭","Game":"🎲","Drink":"🥤","Object":"📦","Machine":"⚙️","Creature":"✨","Building":"🏢"};
@@ -873,6 +876,7 @@ function vRoom(){
   var leave='<button class="btn alt" data-a="leave">Leave room</button></div>';
   if(ph==="uno"||ph==="unoend")return vUno(r,us,isH);
   if(ph==="golf"&&r.golf)return vGolf(r,us,isH);
+  if(ph==="jenga"&&r.jenga)return vJenga(r,us,isH);
   if(ph==="lobby"){
     var nj=us.length,pls=us.map(function(u){var p=r.players[u];return'<div class="pl">'+av(p.name)+'<span>'+esc(p.name)+(u===r.host?' 👑':'')+(u===O.uid?'<span class="you">you</span>':'')+'</span></div>'}).join("");
     h='<div class="panel"><div class="rc"><div class="lb">Room code</div><button class="code" data-a="copy" data-v="'+esc(O.code)+'">'+esc(O.code)+'</button><div class="lb2">'+(O.cp?'Copied. Send it to your friends':'Tap the code to copy it')+'</div></div>'+
@@ -927,6 +931,7 @@ function draw(){
   if(O.view==="room"&&r&&(r.phase==="uno"||r.phase==="unoend")){try{unoFx(r)}catch(e){}}else O.ufx=null;
   uclearFly();
   if(O.view==="room"&&r&&r.phase==="golf"&&r.golf){try{golfSync(r)}catch(e){console.error(e)}}
+  if(O.view==="room"&&r&&r.phase==="jenga"&&r.jenga&&typeof THREE!=="undefined"&&typeof CANNON!=="undefined"){try{jengaSync(r)}catch(e){console.error(e)}}else if(typeof jengaHide==="function")jengaHide();
   $("ovChat").classList.toggle("hide",!(O.view==="room"&&r&&["chat","vote","over"].indexOf(r.phase)>=0));
   $("ci").placeholder=me&&me.alive===false?"Spectators can’t chat":r&&r.mode==="emoji"?"Up to 3 emojis":r&&r.mode==="last"?"One word":"Say something…";
   updDraw();
@@ -985,6 +990,7 @@ function hostMsg(c,d){
     if(!known)p[d.uid]={name:String(d.name).slice(0,14),joined:Date.now(),alive:true};
     bcast();
   }else if(d.t==="op"&&c.uid){applyOp(d.m,d.p,d.b);bcast()}
+  else if(d.t==="js"&&c.uid){jRecv(d);Object.keys(P.conns).forEach(function(u){if(u!==c.uid){try{P.conns[u].send(d)}catch(e){}}})}
 }
 function hostRoom(code,tries){
   var pe=new Peer("impg1-"+code);
@@ -1016,6 +1022,7 @@ function joinRoom(c){
     cn.on("data",function(d){
       if(d.t==="st"){CACHE=d.s;if(!done){done=true;enter(c)}}
       else if(d.t==="err")fail(d.m);
+      else if(d.t==="js"){jRecv(d)}
       else if(d.t==="bye"){CACHE=null}
     });
     cn.on("close",function(){CACHE=null});
@@ -1054,6 +1061,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
   var host=r.host===O.uid;
   if(a.indexOf("uno_")===0){unoAct(a,v,r,host);return}
   if(a.indexOf("g_")===0){golfAct(a,v,r,host);return}
+  if(a.indexOf("j_")===0){jengaAct(a,v,r,host);return}
   if(a==="leave"){
     if(host)closeRoom();
     else{if(r.phase==="lobby")del(rp()+"/players/"+O.uid);dropPeer()}
@@ -1088,6 +1096,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     var us=order(r),n=us.length,m=r.mode;
     if(m==="uno"){if(n<2){oshow("Need at least 2 players");return}upd(unoStart(r));return}
     if(m==="golf"){if(n<2){oshow("Need at least 2 players");return}upd(gPatch(r));return}
+    if(m==="jenga"){if(n<2){oshow("Need at least 2 players");return}upd(jStart(r));return}
     if(n<3){oshow("Need at least 3 players");return}
     if(m==="double"&&n<5){oshow("Double Trouble needs 5 or 6 players");return}
     var k=m==="double"?2:m==="chaos"?rnd([0,1,1,2]):1,sh=us.slice().sort(function(){return Math.random()-.5}),pk;
@@ -1105,7 +1114,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
   if(a==="tovote"){upd({phase:"vote",votes:null});return}
   if(a==="count"){tally(r);return}
   if(a==="again"){
-    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null,why:null,guessed:null,dr:null,uno:null,golf:null};
+    var u2={phase:"lobby",secret:null,seen:null,ready:null,votes:null,chat:null,result:null,winner:null,round:null,why:null,guessed:null,dr:null,uno:null,golf:null,jenga:null};
     order(r).forEach(function(u){u2["players/"+u+"/alive"]=true});upd(u2);
   }
 }
@@ -1992,6 +2001,182 @@ $("ovMain").addEventListener("contextmenu",function(e){if(e.target.closest&&e.ta
 document.addEventListener("visibilitychange",function(){if(document.hidden)hideNotes()});
 document.querySelector("h1").onclick=hideNotes;
 $("ovMain").addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-a="say"]');if(t)t.style.opacity=".35"});
+
+/* ===== JENGA (online only). Host-authoritative room; the player whose turn it is runs the physics ===== */
+var jengaSync,jengaHide,vJenga,jengaAct,jStart,jRecv;
+(function(){
+var JL=3,JW=1,JH=.6,JN=18;
+var S={id:0,turn:0,over:false,loser:null,order:[],blocks:[],picked:null,drag:null,pl:null,settle:0,calm:0,wt:0,wait:false,ok:false,vis:false,raf:0,last:0,az:.7,el:.75,dist:15,ty:5.4,ptr:{},orb:false,pd:0};
+var $j=function(i){return document.getElementById(i)},clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
+var st=document.createElement("style");
+st.textContent="#jg{position:fixed;inset:0;z-index:60;background:radial-gradient(circle at 50% 40%,var(--sf),var(--bg));touch-action:none}#jg canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}#jh{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 8px);text-align:center;pointer-events:none;padding:0 12px}#jst{display:inline-block;background:var(--sf);border:1px solid var(--bd);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700}#jt{margin-top:8px;font-size:13px;color:var(--ac);font-weight:700;min-height:18px}#jb{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:8px;justify-content:center;padding:0 12px}#jb button{padding:12px 16px;border-radius:14px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-weight:600}#jend{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45)}#jend .panel{max-width:360px;width:100%;text-align:center}#jend h2{margin:0 0 6px}";
+document.head.appendChild(st);
+var jg=document.createElement("div");jg.id="jg";jg.className="hide";
+jg.innerHTML='<canvas id="jc"></canvas><div id="jh"><span id="jst"></span><div id="jt"></div></div><div id="jb"><button id="jzo">−</button><button id="jzi">＋</button><button id="jlv">Leave</button></div><div id="jend" class="hide"><div class="panel"><h2 id="jet"></h2><p class="sub" id="jes"></p><div id="jeb"></div></div></div>';
+document.body.appendChild(jg);
+$j("jlv").onclick=function(){act("leave")};
+$j("jzi").onclick=function(){S.dist=clamp(S.dist*.88,7,40)};
+$j("jzo").onclick=function(){S.dist=clamp(S.dist*1.14,7,40)};
+$j("jeb").onclick=function(e){var t=e.target.closest("[data-j]");if(t)act(t.getAttribute("data-j"))};
+var tmr=0;function toast(t){$j("jt").textContent=t;clearTimeout(tmr);tmr=setTimeout(function(){$j("jt").textContent=""},2600)}
+function nm(u){var p=O.room&&O.room.players&&O.room.players[u];return p?p.name:"?"}
+function active(){return S.order.length?S.order[S.turn%S.order.length]:null}
+function canSim(){return !!S.id&&active()===O.uid}
+function canPlay(){return canSim()&&!S.over}
+
+function init(){
+  if(S.ok)return;S.ok=true;
+  S.R=new THREE.WebGLRenderer({canvas:$j("jc"),antialias:true,alpha:true});S.R.shadowMap.enabled=true;
+  S.sc=new THREE.Scene();S.cam=new THREE.PerspectiveCamera(45,1,.1,200);S.dist=innerWidth<innerHeight?24:15;
+  S.sc.add(new THREE.AmbientLight(0xffffff,.65));
+  var sun=new THREE.DirectionalLight(0xffffff,.8);sun.position.set(8,16,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+  var c=sun.shadow.camera;c.left=c.bottom=-9;c.right=c.top=9;c.far=50;S.sc.add(sun);
+  var tb=new THREE.Mesh(new THREE.CylinderGeometry(7,7,.4,48),new THREE.MeshStandardMaterial({color:0x6b4426,roughness:.9}));tb.position.y=-.2;tb.receiveShadow=true;S.sc.add(tb);
+  var w=S.w=new CANNON.World();w.gravity.set(0,-30,0);w.solver.iterations=28;w.solver.tolerance=.0005;
+  S.mat=new CANNON.Material();w.addContactMaterial(new CANNON.ContactMaterial(S.mat,S.mat,{friction:.55,restitution:0,contactEquationStiffness:1e8,contactEquationRelaxation:3}));
+  var g=new CANNON.Body({mass:0,material:S.mat});g.addShape(new CANNON.Plane());g.quaternion.setFromEuler(-Math.PI/2,0,0);w.addBody(g);
+  S.ray=new THREE.Raycaster();S.p2=new THREE.Vector2();S.tmp=new THREE.Vector3();S.qv=new THREE.Quaternion();S.vv=new THREE.Vector3();
+  addEventListener("resize",resize);bind();
+}
+function resize(){if(!S.ok)return;var w=innerWidth,h=innerHeight;S.R.setPixelRatio(Math.min(devicePixelRatio||1,2));S.R.setSize(w,h,false);S.cam.aspect=w/h;S.cam.updateProjectionMatrix()}
+function build(){
+  S.blocks.forEach(function(k){S.w.removeBody(k.b);S.sc.remove(k.m)});S.blocks=[];
+  for(var i=0;i<JN;i++)for(var j=0;j<3;j++){
+    var odd=i%2,sx=odd?JW:JL,sz=odd?JL:JW,o=(j-1)*(JW+.02),y=JH/2+i*(JH+.004);
+    var b=new CANNON.Body({mass:1,material:S.mat,linearDamping:.02,angularDamping:.08});
+    b.addShape(new CANNON.Box(new CANNON.Vec3(sx/2,JH/2,sz/2)));b.position.set(odd?o:0,y,odd?0:o);S.w.addBody(b);
+    var m=new THREE.Mesh(new THREE.BoxGeometry(sx,JH,sz),new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(.07+Math.random()*.03,.55,.48+Math.random()*.12),roughness:.85}));
+    m.castShadow=m.receiveShadow=true;S.sc.add(m);S.blocks.push({b:b,m:m,layer:i,odd:!!odd,t:null,placed:false});
+  }
+  S.picked=null;S.drag=null;S.pl=null;S.wait=false;S.settle=70;sync();
+}
+function sync(){S.blocks.forEach(function(k){k.m.position.copy(k.b.position);k.m.quaternion.copy(k.b.quaternion)})}
+function pack(){var a=[];S.blocks.forEach(function(k){var p=k.b.position,q=k.b.quaternion;a.push(Math.round(p.x*1e3),Math.round(p.y*1e3),Math.round(p.z*1e3),Math.round(q.x*1e3),Math.round(q.y*1e3),Math.round(q.z*1e3),Math.round(q.w*1e3))});return a}
+function okD(d){return Array.isArray(d)&&d.length===S.blocks.length*7&&d.every(Number.isFinite)}
+function setT(d){S.blocks.forEach(function(k,i){k.t=d.slice(i*7,i*7+7).map(function(v){return v/1e3})})}
+function applyHard(d){S.blocks.forEach(function(k,i){var t=d.slice(i*7,i*7+7).map(function(v){return v/1e3}),q=new CANNON.Quaternion(t[3],t[4],t[5],t[6]);q.normalize();
+  dyn(k);k.b.position.set(t[0],t[1],t[2]);k.b.quaternion.copy(q);k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp();k.t=null;k.placed=false});sync()}
+function kin(k){k.b.type=CANNON.Body.KINEMATIC;k.b.mass=0;k.b.updateMassProperties();k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0)}
+function dyn(k){if(k.b.type!==CANNON.Body.DYNAMIC){k.b.type=CANNON.Body.DYNAMIC;k.b.mass=1;k.b.updateMassProperties()}k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp()}
+function lng(k){var v=new CANNON.Vec3(k.odd?0:1,0,k.odd?1:0),o=new CANNON.Vec3();k.b.quaternion.vmult(v,o);var l=Math.hypot(o.x,o.z)||1;return{x:o.x/l,z:o.z/l}}
+function topY(ex){var t=0;S.blocks.forEach(function(k){if(k!==ex&&k.b.position.y>t)t=k.b.position.y});return t}
+
+/* ---- input: a block slides only along its own long axis, then drops onto the top automatically ---- */
+function setRay(e){var r=$j("jc").getBoundingClientRect();S.p2.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);S.ray.setFromCamera(S.p2,S.cam)}
+function pdist(){var a=Object.keys(S.ptr).map(function(i){return S.ptr[i]});return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1}
+function grab(k,pt){
+  S.picked=k;var L=lng(k);kin(k);
+  S.drag={k:k,L:L,pl:new THREE.Plane(new THREE.Vector3(0,1,0),-pt.y),hx:pt.x,hz:pt.z,sx:k.b.position.x,sz:k.b.position.z,tx:k.b.position.x,tz:k.b.position.z};
+}
+function release(){
+  var d=S.drag;if(!d)return;S.drag=null;var k=d.k,p=k.b.position,u=p.x*d.L.x+p.z*d.L.z;
+  if(Math.abs(u)>1.9)plan(k,d.L,u);else{dyn(k)}
+}
+function plan(k,L0,u){
+  var p=k.b.position,ot=S.blocks.filter(function(b){return b!==k}),top=0;ot.forEach(function(b){top=Math.max(top,b.b.position.y)});
+  var tl=ot.filter(function(b){return b.b.position.y>top-.25}),L=lng(tl[0]),Lt={x:-L.z,z:L.x},nl=tl.length>=3,A=nl?Lt:L,B=nl?L:Lt;
+  var al=0;tl.forEach(function(b){al+=b.b.position.x*A.x+b.b.position.z*A.z});al/=tl.length;
+  var occ=nl?[]:tl.map(function(b){return b.b.position.x*B.x+b.b.position.z*B.z}),c=0,cs=[0,-1.02,1.02];
+  for(var i=0;i<3;i++){if(occ.every(function(o){return Math.abs(cs[i]-o)>.6})){c=cs[i];break}}
+  var tx=al*A.x+c*B.x,tz=al*A.z+c*B.z,ny=nl?top+JH+.01:top,yaw=k.odd?Math.atan2(A.x,A.z):Math.atan2(-A.z,A.x);
+  var wp=[],ox=p.x,oz=p.z,hy=top+3;
+  if(Math.abs(u)<3.5){var uu=(u<0?-1:1)*3.8;ox=p.x+L0.x*(uu-u);oz=p.z+L0.z*(uu-u);wp.push({x:ox,y:p.y,z:oz,d:.3})}
+  wp.push({x:ox,y:hy,z:oz,d:.35});wp.push({x:tx,y:hy,z:tz,d:.45,yaw:yaw});wp.push({x:tx,y:ny+.05,z:tz,d:.4});
+  S.pl={k:k,wp:wp,i:0,t:0,f:{x:p.x,y:p.y,z:p.z}};
+}
+function donePlace(){var k=S.pl.k;S.pl=null;S.picked=null;dyn(k);k.placed=true;S.wait=true;S.calm=0;S.wt=0}
+function bind(){
+  var cv=$j("jc");
+  cv.addEventListener("pointerdown",function(e){
+    cv.setPointerCapture(e.pointerId);S.ptr[e.pointerId]=[e.clientX,e.clientY];
+    if(Object.keys(S.ptr).length>1){if(S.drag)release();S.orb=true;S.pd=pdist();return}
+    setRay(e);
+    if(canPlay()&&!S.pl&&!S.wait){
+      var h=S.ray.intersectObjects(S.blocks.map(function(k){return k.m}));
+      if(h.length){var k=S.blocks.filter(function(q){return q.m===h[0].object})[0];
+        if(k&&!k.placed&&(k===S.picked||k.b.position.y<topY(S.picked)-.7)){grab(k,h[0].point);return}
+        if(k)toast("Take a block from lower down, not the top two layers")}}
+    S.orb=true;
+  });
+  cv.addEventListener("pointermove",function(e){
+    var o=S.ptr[e.pointerId];if(!o)return;var dx=e.clientX-o[0],dy=e.clientY-o[1];S.ptr[e.pointerId]=[e.clientX,e.clientY];
+    if(Object.keys(S.ptr).length>1){var d=pdist();S.dist=clamp(S.dist*S.pd/d,7,40);S.pd=d;return}
+    if(S.drag){setRay(e);if(S.ray.ray.intersectPlane(S.drag.pl,S.tmp)){var D=S.drag,s=clamp((S.tmp.x-D.hx)*D.L.x+(S.tmp.z-D.hz)*D.L.z,-5.5,5.5);D.tx=D.sx+D.L.x*s;D.tz=D.sz+D.L.z*s}}
+    else if(S.orb){S.az-=dx*.008;S.el=clamp(S.el+dy*.006,.1,1.45)}
+  });
+  var up=function(e){delete S.ptr[e.pointerId];if(!Object.keys(S.ptr).length){release();S.orb=false}};
+  cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+  cv.addEventListener("wheel",function(e){e.preventDefault();S.dist=clamp(S.dist*(1+Math.sign(e.deltaY)*.08),7,40)},{passive:false});
+}
+
+/* ---- turn flow ---- */
+function endTurn(){
+  S.wait=false;S.blocks.forEach(function(k){k.placed=false});S.turn++;
+  wr(patch(rp(),{"jenga/turn":S.turn,"jenga/snap":pack()}));newTurn();
+}
+function newTurn(){S.settle=25;S.picked=null;S.drag=null;S.pl=null;S.wait=false;status();if(canPlay())toast("Your turn. Slide a block out along its length, then let go")}
+function status(){
+  $j("jst").textContent=S.over?"Game over":(canPlay()?"Your turn":nm(active())+" is playing");
+}
+function showEnd(r){
+  var isH=r.host===O.uid;$j("jet").textContent=S.loser===O.uid?"You toppled it!":nm(S.loser)+" toppled it!";
+  $j("jes").textContent=isH?"Start another round or go back to the lobby.":"Waiting for the host…";
+  $j("jeb").innerHTML=isH?'<button class="btn" data-j="j_new">Play again</button><button class="btn alt" data-j="again">Back to lobby</button>':"";
+  setTimeout(function(){if(S.over)$j("jend").classList.remove("hide")},1500);
+}
+function loop(t){
+  if(!S.vis){S.raf=0;return}
+  S.raf=requestAnimationFrame(loop);var dt=Math.min((t-S.last)/1000||.016,.05);S.last=t;
+  if(canSim()){
+    if(S.drag){var b=S.drag.k.b,dx=S.drag.tx-b.position.x,dz=S.drag.tz-b.position.z,l=Math.hypot(dx,dz),sp=Math.min(l*10,6);
+      if(l>1e-4)b.velocity.set(dx/l*sp,0,dz/l*sp);else b.velocity.set(0,0,0);b.angularVelocity.set(0,0,0)}
+    if(S.pl){var p=S.pl,w=p.wp[p.i],kb=p.k.b;
+      if(p.t===0&&w.yaw!==undefined){var q=new CANNON.Quaternion();q.setFromAxisAngle(new CANNON.Vec3(0,1,0),w.yaw);kb.quaternion.copy(q)}
+      p.t+=dt;var a=Math.min(p.t/w.d,1);
+      kb.position.set(p.f.x+(w.x-p.f.x)*a,p.f.y+(w.y-p.f.y)*a,p.f.z+(w.z-p.f.z)*a);kb.velocity.set(0,0,0);kb.angularVelocity.set(0,0,0);
+      if(a>=1){p.f={x:w.x,y:w.y,z:w.z};p.i++;p.t=0;if(p.i>=p.wp.length)donePlace()}}
+    S.w.step(1/60,dt,5);sync();
+    if(S.settle>0)S.settle--;
+    else if(!S.over&&S.blocks.some(function(k){var p=k.b.position;return k!==S.picked&&(Math.hypot(p.x,p.z)>3.4||(k.layer>0&&p.y<.5))})){
+      S.over=true;S.loser=O.uid;S.drag=null;
+      wr(patch(rp(),{"jenga/loser":O.uid,"jenga/snap":pack()}));status();showEnd(O.room);
+    }
+    if(S.wait&&!S.over){
+      S.wt+=dt;var calm=S.blocks.every(function(k){return k.b.velocity.length()<.25&&k.b.angularVelocity.length()<.8});
+      S.calm=calm?S.calm+dt:0;if(S.calm>1||S.wt>9)endTurn();
+    }
+  }else S.blocks.forEach(function(k){if(k.t){k.m.position.lerp(S.vv.set(k.t[0],k.t[1],k.t[2]),.35);k.m.quaternion.slerp(S.qv.set(k.t[3],k.t[4],k.t[5],k.t[6]),.35)}});
+  S.cam.position.set(Math.sin(S.az)*Math.cos(S.el)*S.dist,S.ty+Math.sin(S.el)*S.dist,Math.cos(S.az)*Math.cos(S.el)*S.dist);S.cam.lookAt(0,S.ty,0);
+  S.R.render(S.sc,S.cam);
+}
+setInterval(function(){
+  if(!S.vis||!canSim())return;
+  var d={t:"js",id:S.id,turn:S.turn,u:O.uid,s:pack()};
+  if(P.host){Object.keys(P.conns).forEach(function(u){try{P.conns[u].send(d)}catch(e){}})}
+  else if(P.hostConn){try{P.hostConn.send(d)}catch(e){}}
+},110);
+
+/* ---- hooks used by the rest of the page ---- */
+jRecv=function(d){if(!d||!S.ok||d.id!==S.id||d.turn!==S.turn||canSim()||d.u!==active()||!okD(d.s))return;setT(d.s)};
+jengaSync=function(r){
+  init();var g=r.jenga;
+  if(!S.vis){S.vis=true;jg.classList.remove("hide");resize();S.last=performance.now();if(!S.raf)S.raf=requestAnimationFrame(loop)}
+  if(S.id!==g.id){S.id=g.id;S.order=g.order||[];S.turn=g.turn||0;S.over=false;S.loser=null;$j("jend").classList.add("hide");build();newTurn()}
+  S.order=g.order||S.order;
+  if(g.turn>S.turn){S.turn=g.turn;if(okD(g.snap))applyHard(g.snap);newTurn()}
+  if(g.loser&&!S.over){S.over=true;S.loser=g.loser;if(okD(g.snap)&&!canSim())setT(g.snap);status();showEnd(r)}
+  status();
+};
+jengaHide=function(){if(!S.vis)return;S.vis=false;jg.classList.add("hide");$j("jend").classList.add("hide");S.id=0};
+vJenga=function(r,us,isH){
+  return'<div class="panel">'+(typeof THREE==="undefined"||typeof CANNON==="undefined"?'The 3D engine didn’t load. Allow cdnjs.cloudflare.com and reload.':'Loading the tower…')+'<button class="btn alt" data-a="leave">Leave room</button></div>';
+};
+jStart=function(r){
+  var o=order(r).sort(function(){return Math.random()-.5});
+  return{phase:"jenga",jenga:{id:Math.floor(Math.random()*1e9)+1,order:o,turn:0,loser:null,snap:null},uno:null,golf:null,secret:null,seen:null,ready:null,votes:null,chat:null,round:null,result:null,winner:null,why:null,guessed:null,dr:null};
+};
+jengaAct=function(a,v,r,host){if(a==="j_new"&&host)upd(jStart(r))};
+})();
 
 /* ===== INSTALL (PWA) ===== */
 var dip=null;
