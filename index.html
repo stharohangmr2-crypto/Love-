@@ -2075,12 +2075,12 @@ function release(){
   var d=S.drag;if(!d)return;S.drag=null;var k=d.k,p=k.b.position,u=p.x*d.L.x+p.z*d.L.z;
   if(Math.abs(u)>1.9)plan(k,d.L,u);else{dyn(k)}
 }
-function plan(k,L0,u){
+function plan(k,L0,u,pref){
   var p=k.b.position,ot=S.blocks.filter(function(b){return b!==k}),top=0;ot.forEach(function(b){top=Math.max(top,b.b.position.y)});
   var tl=ot.filter(function(b){return b.b.position.y>top-.25}),L=lng(tl[0]),Lt={x:-L.z,z:L.x},nl=tl.length>=3,A=nl?Lt:L,B=nl?L:Lt;
   var al=0;tl.forEach(function(b){al+=b.b.position.x*A.x+b.b.position.z*A.z});al/=tl.length;
-  var occ=nl?[]:tl.map(function(b){return b.b.position.x*B.x+b.b.position.z*B.z}),c=0,cs=[0,-1.02,1.02];
-  for(var i=0;i<3;i++){if(occ.every(function(o){return Math.abs(cs[i]-o)>.6})){c=cs[i];break}}
+  var occ=nl?[]:tl.map(function(b){return b.b.position.x*B.x+b.b.position.z*B.z}),cs=[0,-1.02,1.02],fr=cs.filter(function(x){return occ.every(function(o){return Math.abs(x-o)>.6})}),c=fr.length?fr[0]:0;
+  if(pref&&fr.length){var hp=pref.x*B.x+pref.z*B.z;c=fr.reduce(function(a,b){return Math.abs(b-hp)<Math.abs(a-hp)?b:a})}
   var tx=al*A.x+c*B.x,tz=al*A.z+c*B.z,ny=nl?top+JH+.01:top,yaw=k.odd?Math.atan2(A.x,A.z):Math.atan2(-A.z,A.x);
   var wp=[],ox=p.x,oz=p.z,hy=top+3;
   if(Math.abs(u)<3.5){var uu=(u<0?-1:1)*3.8;ox=p.x+L0.x*(uu-u);oz=p.z+L0.z*(uu-u);wp.push({x:ox,y:p.y,z:oz,d:.3})}
@@ -2100,12 +2100,14 @@ function hit(){
   var m=S.mini;if(!m||m.done||!canPlay())return;
   if(m.p>=m.z[0]&&m.p<=m.z[1]){
     m.step++;S.drag.tx=S.drag.sx+m.L.x*m.dir*.8*m.step;S.drag.tz=S.drag.sz+m.L.z*m.dir*.8*m.step;
-    if(m.step>=4){m.done=true;$j("jm").classList.add("hide");toast("It’s out! Tap anywhere to place it on top")}
+    if(m.step>=4){m.done=true;$j("jm").classList.add("hide");toast("It’s out! Tap the spot on the tower where it should go")}
     else{toast("Nice! The next one is harder");zone()}
   }else{jolt(m.k);toast("Missed! The tower shakes");zone()}
 }
-function placeIt(){
-  var m=S.mini;if(!m||!m.done||S.pl)return;S.mini=null;var k=m.k,p=k.b.position;S.drag=null;plan(k,m.L,p.x*m.L.x+p.z*m.L.z);
+function placeIt(e){
+  var m=S.mini;if(!m||!m.done||S.pl)return;var pref=null;
+  if(e){setRay(e);var h=S.ray.intersectObjects(S.blocks.filter(function(b){return b!==m.k}).map(function(b){return b.m}));if(h.length)pref=h[0].point}
+  S.mini=null;var k=m.k,p=k.b.position;S.drag=null;plan(k,m.L,p.x*m.L.x+p.z*m.L.z,pref);
 }
 function bind(){
   var cv=$j("jc");
@@ -2127,7 +2129,7 @@ function bind(){
   var up=function(e){
     var last=Object.keys(S.ptr).length===1;delete S.ptr[e.pointerId];
     if(last&&S.mv<10&&e.type==="pointerup"){
-      if(S.mini&&S.mini.done)placeIt();
+      if(S.mini&&S.mini.done)placeIt(e);
       else if(S.cand&&canPlay()&&!S.mini&&!S.pl&&!S.wait)startMini(S.cand);
     }
     if(!Object.keys(S.ptr).length){S.orb=false;S.cand=null}
@@ -2164,7 +2166,9 @@ function loop(t){
       p.t+=dt;var a=Math.min(p.t/w.d,1);
       kb.position.set(p.f.x+(w.x-p.f.x)*a,p.f.y+(w.y-p.f.y)*a,p.f.z+(w.z-p.f.z)*a);kb.velocity.set(0,0,0);kb.angularVelocity.set(0,0,0);
       if(a>=1){p.f={x:w.x,y:w.y,z:w.z};p.i++;p.t=0;if(p.i>=p.wp.length)donePlace()}}
-    S.w.step(1/120,dt,10);sync();
+    S.w.step(1/120,dt,10);
+    S.blocks.forEach(function(k){if(k===S.picked||k.b.type!==CANNON.Body.DYNAMIC)return;var v=k.b.velocity,w=k.b.angularVelocity;if(v.norm2()<.0036&&w.norm2()<.025){v.set(0,0,0);w.set(0,0,0)}});
+    sync();
     if(S.settle>0)S.settle--;
     else if(!S.over&&S.blocks.some(function(k){var p=k.b.position;return k!==S.picked&&(Math.hypot(p.x,p.z)>3.4||(k.layer>0&&p.y<.5))})){
       S.over=true;S.loser=O.uid;S.drag=null;
