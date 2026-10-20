@@ -2054,11 +2054,11 @@ function build(){
   S.picked=null;S.drag=null;S.pl=null;S.wait=false;S.settle=70;sync();
 }
 function sync(){S.blocks.forEach(function(k){k.m.position.copy(k.b.position);k.m.quaternion.copy(k.b.quaternion)})}
-function pack(){var a=[];S.blocks.forEach(function(k){var p=k.b.position,q=k.b.quaternion;a.push(Math.round(p.x*1e3),Math.round(p.y*1e3),Math.round(p.z*1e3),Math.round(q.x*1e3),Math.round(q.y*1e3),Math.round(q.z*1e3),Math.round(q.w*1e3))});return a}
+function pack(){var a=[];S.blocks.forEach(function(k){var p=k.b.position,q=k.b.quaternion;a.push(Math.round(p.x*1e5),Math.round(p.y*1e5),Math.round(p.z*1e5),Math.round(q.x*1e5),Math.round(q.y*1e5),Math.round(q.z*1e5),Math.round(q.w*1e5))});return a}
 function okD(d){return Array.isArray(d)&&d.length===S.blocks.length*7&&d.every(Number.isFinite)}
-function setT(d){S.blocks.forEach(function(k,i){k.t=d.slice(i*7,i*7+7).map(function(v){return v/1e3})})}
-function applyHard(d){S.blocks.forEach(function(k,i){var t=d.slice(i*7,i*7+7).map(function(v){return v/1e3}),q=new CANNON.Quaternion(t[3],t[4],t[5],t[6]);q.normalize();
-  dyn(k);k.b.position.set(t[0],t[1],t[2]);k.b.quaternion.copy(q);k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp();k.t=null;k.placed=false});sync()}
+function setT(d){S.blocks.forEach(function(k,i){k.t=d.slice(i*7,i*7+7).map(function(v){return v/1e5})})}
+function applyHard(d){S.blocks.forEach(function(k,i){var t=d.slice(i*7,i*7+7).map(function(v){return v/1e5}),q=new CANNON.Quaternion(t[3],t[4],t[5],t[6]);q.normalize();
+  dyn(k);k.b.position.set(t[0],t[1],t[2]);k.b.quaternion.copy(q);k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.sleep();k.t=null;k.placed=false});sync()}
 function kin(k){k.b.material=S.slick;k.b.type=CANNON.Body.KINEMATIC;k.b.mass=0;k.b.updateMassProperties();k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0)}
 function dyn(k){k.b.material=S.mat;if(k.b.type!==CANNON.Body.DYNAMIC){k.b.type=CANNON.Body.DYNAMIC;k.b.mass=1;k.b.updateMassProperties()}k.b.velocity.set(0,0,0);k.b.angularVelocity.set(0,0,0);k.b.wakeUp()}
 function lng(k){var v=new CANNON.Vec3(k.odd?0:1,0,k.odd?1:0),o=new CANNON.Vec3();k.b.quaternion.vmult(v,o);var l=Math.hypot(o.x,o.z)||1;return{x:o.x/l,z:o.z/l}}
@@ -2088,7 +2088,7 @@ function plan(k,L0,u){
   S.pl={k:k,wp:wp,i:0,t:0,f:{x:p.x,y:p.y,z:p.z}};
 }
 function donePlace(){var k=S.pl.k;S.pl=null;S.picked=null;dyn(k);k.placed=true;S.wait=true;S.calm=0;S.wt=0}
-function zone(){var m=S.mini,w=[.30,.24,.18,.13][m.step],c=.15+Math.random()*.7;m.z=[Math.max(0,c-w/2),Math.min(1,c+w/2)];m.sp=[.9,1.3,1.75,2.3][m.step];m.p=0;m.d=1;
+function zone(){var m=S.mini,w=[.34,.28,.22,.17][m.step],c=.15+Math.random()*.7;m.z=[Math.max(0,c-w/2),Math.min(1,c+w/2)];m.sp=[.55,.75,.95,1.2][m.step];m.p=0;m.d=1;
   $j("jzn").style.left=m.z[0]*100+"%";$j("jzn").style.width=(m.z[1]-m.z[0])*100+"%";$j("jml").textContent="Hit the green · "+(m.step+1)+" of 4"}
 function startMini(k){
   var L=lng(k),cp=S.cam.position,dir=(cp.x*L.x+cp.z*L.z)>=0?1:-1,p=k.b.position;
@@ -2141,7 +2141,7 @@ function endTurn(){
   S.wait=false;S.blocks.forEach(function(k){k.placed=false});S.turn++;
   wr(patch(rp(),{"jenga/turn":S.turn,"jenga/snap":pack()}));newTurn();
 }
-function newTurn(){S.mini=null;$j("jm").classList.add("hide");S.settle=25;S.picked=null;S.drag=null;S.pl=null;S.wait=false;status();if(canPlay())toast("Your turn. Tap a block to start pulling it out")}
+function newTurn(){S.mini=null;$j("jm").classList.add("hide");S.settle=100;S.picked=null;S.drag=null;S.pl=null;S.wait=false;status();if(canPlay())toast("Your turn. Tap a block to start pulling it out")}
 function status(){
   if(S.over)$j("jm").classList.add("hide");
   $j("jst").textContent=S.over?"Game over":(canPlay()?"Your turn":nm(active())+" is playing");
@@ -2171,8 +2171,8 @@ function loop(t){
       wr(patch(rp(),{"jenga/loser":O.uid,"jenga/snap":pack()}));status();showEnd(O.room);
     }
     if(S.wait&&!S.over){
-      S.wt+=dt;var calm=S.blocks.every(function(k){return k.b.velocity.length()<.25&&k.b.angularVelocity.length()<.8});
-      S.calm=calm?S.calm+dt:0;if(S.calm>1||S.wt>9)endTurn();
+      S.wt+=dt;var calm=S.blocks.every(function(k){return k.b.velocity.length()<.08&&k.b.angularVelocity.length()<.3});
+      S.calm=calm?S.calm+dt:0;if(S.calm>1.5||S.wt>10)endTurn();
     }
   }else S.blocks.forEach(function(k){if(k.t){k.m.position.lerp(S.vv.set(k.t[0],k.t[1],k.t[2]),.35);k.m.quaternion.slerp(S.qv.set(k.t[3],k.t[4],k.t[5],k.t[6]),.35)}});
   S.cam.position.set(Math.sin(S.az)*Math.cos(S.el)*S.dist,S.ty+Math.sin(S.el)*S.dist,Math.cos(S.az)*Math.cos(S.el)*S.dist);S.cam.lookAt(0,S.ty,0);
