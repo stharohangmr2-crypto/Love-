@@ -311,7 +311,7 @@ var MODES=[
 {id:"last",n:"Last Letter",d:"Imposter knows only the first letter. One word each, and the imposter can guess",o:1},
 {id:"uno",n:"UNO",d:"Classic UNO. 2 to 6 players, online only",o:1},
 {id:"golf",n:"Golf",d:"3D-style golf, 5 holes. 2 to 6 players, online only. Drag back and release to swing",o:1},
-{id:"jenga",n:"Jenga",d:"3D tower with real physics. 2 to 6 players, online only. Slide a block out, it drops on top, don’t topple the tower",o:1}];
+{id:"jenga",n:"Jenga",d:"3D tower with real physics. 1 to 6 players (solo works for testing), online only. Slide a block out, it drops on top, don’t topple the tower",o:1}];
 var CATS={"Pizza":"Food","Elephant":"Animal","Guitar":"Instrument","Hospital":"Place","Football":"Sport","Airplane":"Transport","Library":"Place","Ocean":"Nature","Birthday":"Event","Doctor":"Job","Volcano":"Nature","Cinema":"Place","Bicycle":"Transport","Snowman":"Winter","Pirate":"Character","Chess":"Game","Coffee":"Drink","Rainbow":"Nature","Astronaut":"Job","Castle":"Place","Ninja":"Character","Sushi":"Food","Camera":"Object","Desert":"Nature","Robot":"Machine","Dragon":"Creature","Lighthouse":"Building","Piano":"Instrument","Tiger":"Animal","Rocket":"Transport","Mountain":"Nature","Samurai":"Character","Fireworks":"Event","School":"Place","Wedding":"Event"};
 var RULES={classic:"Describe the word in one sentence each, then vote out the imposter.",blind:"Describe the word in one sentence each. The imposter is totally blind, so listen closely.",double:"Describe the word in one sentence each. Two of you are faking it.",under:"Describe your word in one sentence each. Someone has a different word and doesn’t know it.",quest:"Say your answer out loud, one by one. Someone answered a different question.",chaos:"Describe the word in one sentence each. There might be no imposter at all.",age:"Everyone knows who the age holder is. Ask them questions, then each player guesses their age.",draw:"Take turns adding strokes to the shared drawing, then discuss and vote. Someone doesn’t know the word and is faking it.",emoji:"Chat with up to 3 emojis only. Someone only knows the category, so watch for vague ones.",last:"Say one word that goes with the secret word. The imposter only knows its first letter and gets one guess."};
 var rohanI=-1,N=4,mode="classic",players=[],imps=[],pick=null,idx=0,shown=false,ch={};
@@ -565,7 +565,7 @@ function rq(m,p,b){
 var get=function(p){return rq("GET",p)},put=function(p,b){return rq("PUT",p,b)},patch=function(p,b){return rq("PATCH",p,b)},del=function(p){return rq("DELETE",p)},push=function(p,b){return rq("POST",p,b)};
 var OM=MODES.filter(function(m){return m.id!=="age"});
 var ONL={draw:1,emoji:1,last:1},LAPS=2;
-var minP=function(m){return m==="uno"||m==="golf"||m==="jenga"?2:3};
+var minP=function(m){return m==="jenga"?1:(m==="uno"||m==="golf"?2:3)};
 var modeDesc=function(id){var m=MODES.filter(function(o){return o.id===id})[0];return m?m.d:""};
 var EMO={"Pizza":"🍕🧀","Elephant":"🐘🌍","Guitar":"🎸🎶","Hospital":"🏥🚑","Football":"⚽🏟️","Airplane":"✈️☁️","Library":"📚🤫","Ocean":"🌊🧂","Birthday":"🎂🕯️🎉","Doctor":"🩺👨‍⚕️","Volcano":"🌋🔥","Cinema":"🎬🍿","Bicycle":"🚲🦵","Snowman":"⛄🥕","Pirate":"🏴‍☠️💰","Chess":"♟️👑","Coffee":"☕🌅","Rainbow":"🌈☔","Astronaut":"🧑‍🚀🌌","Castle":"🏰🐊","Ninja":"🥷🌑","Sushi":"🍣🍚","Camera":"📷🔍","Desert":"🏜️🌵","Robot":"🤖⚙️","Dragon":"🐉🔥","Lighthouse":"💡🌊🚢","Piano":"🎹🎼","Tiger":"🐯🌴","Rocket":"🚀🔥","Mountain":"⛰️❄️","Samurai":"⚔️🏯","Fireworks":"🎆🌃","School":"🏫🔔","Wedding":"💍👰"};
 var CATEM={"Food":"🍽️","Animal":"🐾","Instrument":"🎵","Place":"📍","Sport":"🏅","Transport":"🚦","Nature":"🌿","Event":"🎉","Job":"💼","Winter":"❄️","Character":"🎭","Game":"🎲","Drink":"🥤","Object":"📦","Machine":"⚙️","Creature":"✨","Building":"🏢"};
@@ -1096,7 +1096,7 @@ if(a==="joincode"){joinRoom(($("oc").value||"").trim().toUpperCase());return}
     var us=order(r),n=us.length,m=r.mode;
     if(m==="uno"){if(n<2){oshow("Need at least 2 players");return}upd(unoStart(r));return}
     if(m==="golf"){if(n<2){oshow("Need at least 2 players");return}upd(gPatch(r));return}
-    if(m==="jenga"){if(n<2){oshow("Need at least 2 players");return}upd(jStart(r));return}
+    if(m==="jenga"){upd(jStart(r));return}
     if(n<3){oshow("Need at least 3 players");return}
     if(m==="double"&&n<5){oshow("Double Trouble needs 5 or 6 players");return}
     var k=m==="double"?2:m==="chaos"?rnd([0,1,1,2]):1,sh=us.slice().sort(function(){return Math.random()-.5}),pk;
